@@ -145,6 +145,18 @@ public:
 	sc_signal<len_type> awlen;
 	sc_signal<size_type> awsize;
 	sc_signal<bool> awready;
+
+	sc_signal<bool> wvalid;
+	sc_signal<id_type> wid;
+	sc_signal<bool> wlast;
+	sc_signal<strb_type> wstrb;
+	sc_signal<data_type> wdata;
+	sc_signal<bool> wready;
+
+	sc_signal<bool> bvalid;
+	sc_signal<id_type> bid;
+	sc_signal<resp_type> bresp;
+	sc_signal<bool> bready;
 };
 
 class amba3_axi_ar_sig:public amba3_axi_type{
@@ -155,20 +167,7 @@ public:
 	sc_signal<len_type> arlen;
 	sc_signal<size_type> arsize;
 	sc_signal<bool> arready;
-};
 
-class amba3_axi_wd_sig:public amba3_axi_type{
-public:
-	sc_signal<bool> wvalid;
-	sc_signal<id_type> wid;
-	sc_signal<bool> wlast;
-	sc_signal<strb_type> wstrb;
-	sc_signal<data_type> wdata;
-	sc_signal<bool> wready;
-};
-
-class amba3_axi_rd_sig:public amba3_axi_type{
-public:
 	sc_signal<bool> rvalid;
 	sc_signal<id_type> rid;
 	sc_signal<bool> rlast;
@@ -177,12 +176,74 @@ public:
 	sc_signal<bool> rready;
 };
 
-class amba3_axi_br_sig:public amba3_axi_type{
+class amba3_axi_w_base_initiator:public amba3_axi_type{
 public:
-	sc_signal<bool> bvalid;
-	sc_signal<id_type> bid;
-	sc_signal<bool> bready;
+	sc_out<bool> awvalid;
+	sc_out<id_type> awid;
+	sc_out<addr_type> awaddr;
+	sc_out<len_type> awlen;
+	sc_out<size_type> awsize;
+	sc_in<bool> awready;
+
+	sc_out<bool> wvalid;
+	sc_out<id_type> wid;
+	sc_out<bool> wlast;
+	sc_out<strb_type> wstrb;
+	sc_out<data_type> wdata;
+	sc_in<bool> wready;
+
+	sc_in<bool> bvalid;
+	sc_in<id_type> bid;
+	sc_in<resp_type> bresp;
+	sc_out<bool> bready;
+
+	amba3_axi_w_base_initiator(const char* name=sc_gen_unique_name("amba3_axi_w_base_initiator"))
+	:awvalid(PIN_NAME(name,"awvalid"))
+	,awid(PIN_NAME(name,"awid"))
+	,awaddr(PIN_NAME(name,"awaddr"))
+	,awlen(PIN_NAME(name,"awlen"))
+	,awsize(PIN_NAME(name,"awsize"))
+	,awready(PIN_NAME(name,"awready"))
+	,wvalid(PIN_NAME(name,"wvalid"))
+	,wid(PIN_NAME(name,"wid"))
+	,wlast(PIN_NAME(name,"wlast"))
+	,wstrb(PIN_NAME(name,"wstrb"))
+	,wdata(PIN_NAME(name,"wdata"))
+	,wready(PIN_NAME(name,"wready"))
+	,bvalid(PIN_NAME(name,"bvalid"))
+	,bid(PIN_NAME(name,"bid"))
+	,bresp(PIN_NAME(name,"bresp"))
+	,bready(PIN_NAME(name,"bready")){}
+
+	template<class C> void bind(C& c){
+		awvalid(c.awvalid);
+		awid(c.awid);
+		awaddr(c.awaddr);
+		awlen(c.awlen);
+		awsize(c.awsize);
+		awready(c.awready);
+
+		wvalid(c.wvalid);
+		wid(c.wid);
+		wlast(c.wlast);
+		wstrb(c.wstrb);
+		wdata(c.wdata);
+		wready(c.wready);
+
+		bvalid(c.bvalid);
+		bid(c.bid);
+		bresp(c.bresp);
+		bready(c.bready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
 };
+
+
+
+
 
 class amba3_axi_sig:public amba3_axi_type{
 public:
