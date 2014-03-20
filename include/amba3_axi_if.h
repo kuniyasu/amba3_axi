@@ -14,6 +14,10 @@ using namespace tlm;
 
 #include "syn_fifo.h"
 
+class BUFFERABLE{};
+class NONBUFFERABLE{};
+
+
 class PIN{};
 class TLM2LT{};
 class TLM2AT{};
@@ -313,7 +317,7 @@ public:
 	}
 };
 
-template<class CFG=amba3_axi_type> class amba3_axi_w_initiator_:public sc_module, public amba3_axi_w_base_initiator<CFG>{
+template<class CFG=amba3_axi_type,class BF=NONBUFFERABLE> class amba3_axi_w_initiator_:public sc_module, public amba3_axi_w_base_initiator<CFG>{
 public:
 	typedef amba3_axi_w_base_initiator<CFG> base_type;
 
@@ -464,7 +468,7 @@ public:
 	}
 };
 
-template<class CFG=amba3_axi_type> class amba3_axi_w_buffable_initiator_:public sc_module, public amba3_axi_w_base_initiator<CFG>{
+template<class CFG=amba3_axi_type> class amba3_axi_w_initiator_<CFG,BUFFERABLE>:public sc_module, public amba3_axi_w_base_initiator<CFG>{
 public:
 	typedef amba3_axi_w_base_initiator<CFG> base_type;
 
@@ -474,9 +478,9 @@ public:
 	syn_channel_in<amba3_axi_wd_type<CFG>,  CFG::W_FIFO_SIZE,  CFG::W_FIFO_CNT_WIDTH> w_fifo;
 	syn_channel_in<amba3_axi_resp_type<CFG>,  CFG::B_FIFO_SIZE,  CFG::B_FIFO_CNT_WIDTH> b_fifo;
 
-	SC_HAS_PROCESS(amba3_axi_w_buffable_initiator_);
+	SC_HAS_PROCESS(amba3_axi_w_initiator_);
 
-	amba3_axi_w_buffable_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_w_buffable_initiator_")):sc_module(name),base_type(name){
+	amba3_axi_w_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_w_initiator_")):sc_module(name),base_type(name){
 		SC_CTHREAD(aw_thread,clk.pos());
 		async_reset_signal_is(nrst,false);
 
