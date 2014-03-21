@@ -16,7 +16,7 @@ public:
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
 
-	amba3_axi_aw_initiator_<> a;
+	amba3_axi_initiator_<> put_if;
 //	syn_fifo_3<sc_uint<4> >::put put_if;
 
 	SC_HAS_PROCESS(Producer);
@@ -49,6 +49,7 @@ public:
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
 
+	amba3_axi_target_<> get_if;
 //	syn_fifo_3<sc_uint<4> >::get get_if;
 
 	SC_HAS_PROCESS(Consumer);
@@ -85,6 +86,8 @@ public:
 	sc_signal<bool> nrst;
 	Producer producer;
 	Consumer consumer;
+
+	amba3_axi_sig chain;
 //	syn_fifo_3<sc_uint<4> >::channel chain;
 
 	SC_HAS_PROCESS(TOP);
@@ -94,16 +97,16 @@ public:
 	,nrst("nrst")
 	,producer("producer")
 	,consumer("consumer")
-	//,chain("chain")
+	,chain("chain")
 	{
 
 		producer.clk(clk);
 		producer.nrst(nrst);
-//		producer.put_if.bind(chain);
+		producer.put_if(chain);
 
 		consumer.clk(clk);
 		consumer.nrst(nrst);
-//		consumer.get_if.bind(chain);
+		consumer.get_if(chain);
 
 		SC_THREAD(timeout_thread);
 		end_module();

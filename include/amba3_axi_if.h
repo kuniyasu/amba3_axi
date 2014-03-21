@@ -1966,9 +1966,49 @@ public:
 	template<class C> void operator()(C& c){
 		bind(c);
 	}
-
 };
 
+template<class CFG=amba3_axi_type, class AW_BF=NONBUFFERABLE, class WD_BF=NONBUFFERABLE, class BR_BF=NONBUFFERABLE>
+class amba3_axi_w_target_:public amba3_axi_aw_target_<CFG,AW_BF>,public amba3_axi_wd_target_<CFG,WD_BF>,public amba3_axi_br_target_<CFG,BR_BF>{
+public:
+	typedef amba3_axi_aw_base_target<CFG> aw_type;
+	typedef amba3_axi_wd_base_target<CFG> wd_type;
+	typedef amba3_axi_br_base_target<CFG> br_type;
+
+
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	amba3_axi_w_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_w_target_"))
+	:amba3_axi_aw_target_<CFG,AW_BF>(name),amba3_axi_wd_target_<CFG,WD_BF>(name),amba3_axi_br_target_<CFG,BR_BF>(name){
+		end_module();
+	}
+
+	template<class C> void bind(C& c){
+		aw_type::awvalid(c.awvalid);
+		aw_type::awid(c.awid);
+		aw_type::awaddr(c.awaddr);
+		aw_type::awlen(c.awlen);
+		aw_type::awsize(c.awsize);
+		aw_type::awready(c.awready);
+
+		wd_type::wvalid(c.wvalid);
+		wd_type::wid(c.wid);
+		wd_type::wlast(c.wlast);
+		wd_type::wstrb(c.wstrb);
+		wd_type::wdata(c.wdata);
+		wd_type::wready(c.wready);
+
+		br_type::bvalid(c.bvalid);
+		br_type::bid(c.bid);
+		br_type::bresp(c.bresp);
+		br_type::bready(c.bready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
 
 template<class CFG=amba3_axi_type,class AR_BF=NONBUFFERABLE, class RD_BF=NONBUFFERABLE>
 class amba3_axi_r_initiator_:public amba3_axi_ar_initiator_<CFG,AR_BF>,public amba3_axi_rd_initiator_<RD_BF,CFG>{
@@ -2005,7 +2045,43 @@ public:
 	template<class C> void operator()(C& c){
 		bind(c);
 	}
+};
 
+template<class CFG=amba3_axi_type,class AR_BF=NONBUFFERABLE, class RD_BF=NONBUFFERABLE>
+class amba3_axi_r_target_:public amba3_axi_ar_target_<CFG,AR_BF>,public amba3_axi_rd_target_<RD_BF,CFG>{
+public:
+	typedef amba3_axi_ar_base_target<CFG> ar_type;
+	typedef amba3_axi_rd_base_target<CFG> rd_type;
+
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	SC_HAS_PROCESS(amba3_axi_r_target_);
+
+	amba3_axi_r_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_r_target_"))
+	:amba3_axi_ar_target_<CFG,AR_BF>(name),amba3_axi_rd_target_<RD_BF,CFG>(name){
+		end_module();
+	}
+
+	template<class C> void bind(C& c){
+		ar_type::arvalid(c.arvalid);
+		ar_type::arid(c.arid);
+		ar_type::araddr(c.araddr);
+		ar_type::arlen(c.arlen);
+		ar_type::arsize(c.arsize);
+		ar_type::arready(c.arready);
+
+		rd_type::rvalid(c.rvalid);
+		rd_type::rid(c.rid);
+		rd_type::rlast(c.rlast);
+		rd_type::rresp(c.rresp);
+		rd_type::rdata(c.rdata);
+		rd_type::rready(c.rready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
 };
 
 template<class CFG=amba3_axi_type, class AW_BF=NONBUFFERABLE, class WD_BF=NONBUFFERABLE, class BR_BF=NONBUFFERABLE, class AR_BF=NONBUFFERABLE, class RD_BF=NONBUFFERABLE>
@@ -2070,4 +2146,66 @@ public:
 	}
 };
 
+
+template<class CFG=amba3_axi_type, class AW_BF=NONBUFFERABLE, class WD_BF=NONBUFFERABLE, class BR_BF=NONBUFFERABLE, class AR_BF=NONBUFFERABLE, class RD_BF=NONBUFFERABLE>
+class amba3_axi_target_:public amba3_axi_aw_target_<CFG,AW_BF>,public amba3_axi_wd_target_<CFG,WD_BF>,public amba3_axi_br_target_<CFG,BR_BF>,public amba3_axi_ar_target_<CFG,AR_BF>,public amba3_axi_rd_target_<RD_BF,CFG>{
+public:
+	typedef amba3_axi_aw_base_target<CFG> aw_type;
+	typedef amba3_axi_wd_base_target<CFG> wd_type;
+	typedef amba3_axi_br_base_target<CFG> br_type;
+	typedef amba3_axi_ar_base_target<CFG> ar_type;
+	typedef amba3_axi_rd_base_target<CFG> rd_type;
+
+
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	amba3_axi_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_target_"))
+	:amba3_axi_aw_target_<CFG,AW_BF>(name)
+	 ,amba3_axi_wd_target_<CFG,WD_BF>(name)
+	 ,amba3_axi_br_target_<CFG,BR_BF>(name)
+	 ,amba3_axi_wd_target_<CFG,WD_BF>(name)
+	 ,amba3_axi_br_target_<CFG,BR_BF>(name){
+		end_module();
+	}
+
+	template<class C> void bind(C& c){
+		aw_type::awvalid(c.awvalid);
+		aw_type::awid(c.awid);
+		aw_type::awaddr(c.awaddr);
+		aw_type::awlen(c.awlen);
+		aw_type::awsize(c.awsize);
+		aw_type::awready(c.awready);
+
+		wd_type::wvalid(c.wvalid);
+		wd_type::wid(c.wid);
+		wd_type::wlast(c.wlast);
+		wd_type::wstrb(c.wstrb);
+		wd_type::wdata(c.wdata);
+		wd_type::wready(c.wready);
+
+		br_type::bvalid(c.bvalid);
+		br_type::bid(c.bid);
+		br_type::bresp(c.bresp);
+		br_type::bready(c.bready);
+
+		ar_type::arvalid(c.arvalid);
+		ar_type::arid(c.arid);
+		ar_type::araddr(c.araddr);
+		ar_type::arlen(c.arlen);
+		ar_type::arsize(c.arsize);
+		ar_type::arready(c.arready);
+
+		rd_type::rvalid(c.rvalid);
+		rd_type::rid(c.rid);
+		rd_type::rlast(c.rlast);
+		rd_type::rresp(c.rresp);
+		rd_type::rdata(c.rdata);
+		rd_type::rready(c.rready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
 #endif /* AMBA3_AXI_IF_H_ */
