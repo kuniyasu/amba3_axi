@@ -1213,7 +1213,6 @@ public:
 		data_type _dt;
 		_dt.id = base_type::bid.read();
 		_dt.resp = base_type::bresp.read();
-
 		dt = _dt;
 	}
 };
