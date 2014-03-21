@@ -876,7 +876,7 @@ public:
 	}
 
 	virtual void aw_reset(){
-		amba3_axi_address_type<CFG> aw;
+		amba3_axi_address_type<CFG> aw = amba3_axi_address_type<CFG>();
 
 		base_type::awvalid.write(false);
 		base_type::awid.write(aw.id);
@@ -1017,7 +1017,7 @@ public:
 		base_type::araddr.write(ar.addr);
 		base_type::arlen.write(ar.len);
 		base_type::arsize.write(ar.size);
-		STALL( base_type::arready.read() );
+		STALL( base_type::arready.read() == false);
 		base_type::arvalid.write(false);
 	}
 
@@ -1477,7 +1477,7 @@ public:
 		base_type::awaddr.write(aw.addr);
 		base_type::awlen.write(aw.len);
 		base_type::awsize.write(aw.size);
-		STALL( base_type::awready.read() );
+		STALL( base_type::awready.read() == false);
 		base_type::awvalid.write(false);
 	}
 
@@ -1559,7 +1559,7 @@ public:
 		base_type::araddr.write(ar.addr);
 		base_type::arlen.write(ar.len);
 		base_type::arsize.write(ar.size);
-		STALL( base_type::arready.read() );
+		STALL( base_type::arready.read() == false);
 		base_type::arvalid.write(false);
 	}
 
