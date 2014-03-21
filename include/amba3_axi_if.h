@@ -54,10 +54,11 @@ template<class CFG, class BF> class amba3_axi_wd_initiator_;
 template<class CFG, class BF> class amba3_axi_rd_initiator_;
 template<class CFG, class BF> class amba3_axi_br_initiator_;
 
-template<class CFG, class AW_BF,class WD_BF, class BR_BF> class amba3_axi_w_initiator_;
-template<class CFG, class AR_BF,class RD_BF> class amba3_axi_r_initiator_;
+template<class CFG> class amba3_axi_w_initiator_;
+template<class CFG> class amba3_axi_r_initiator_;
 
-template<class CFG, class AW_BF, class WD_BF, class BR_BF, class AR_BF, class RD_BF> class amba3_axi_initiator_;
+template<class CFG> class amba3_axi_initiator_;
+template<class CFG> class amba3_axi_target_;
 
 class amba3_axi_type;
 template<class CFG> class amba3_axi_address_type;
@@ -105,6 +106,12 @@ public:
 
 	static const unsigned int B_FIFO_SIZE = 2U;
 	static const unsigned int B_FIFO_CNT_WIDTH = 1U;
+
+	typedef NONBUFFERABLE AW_BF;
+	typedef NONBUFFERABLE WD_BF;
+	typedef NONBUFFERABLE BR_BF;
+	typedef NONBUFFERABLE AR_BF;
+	typedef NONBUFFERABLE RD_BF;
 
 };
 
@@ -2844,7 +2851,7 @@ public:
 };
 
 
-template<class CFG=amba3_axi_type, class AW_BF=NONBUFFERABLE, class WD_BF=NONBUFFERABLE, class BR_BF=NONBUFFERABLE>
+template<class CFG=amba3_axi_type>
 class amba3_axi_w_initiator_:public amba3_axi_aw_base_initiator<CFG>,public amba3_axi_wd_base_initiator<CFG>,public amba3_axi_br_base_initiator<CFG>{
 
 public:
@@ -2855,9 +2862,9 @@ public:
 
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
-	amba3_axi_aw_initiator_<CFG,AW_BF> aw;
-	amba3_axi_wd_initiator_<CFG,WD_BF> wd;
-	amba3_axi_br_initiator_<CFG,BR_BF> br;
+	amba3_axi_aw_initiator_<CFG, typename CFG::AW_BF> aw;
+	amba3_axi_wd_initiator_<CFG, typename CFG::WD_BF> wd;
+	amba3_axi_br_initiator_<CFG, typename CFG::BR_BF> br;
 
 	amba3_axi_w_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_w_initiator_")):clk(PIN_NAME(name,"clk")),nrst(PIN_NAME(name,"nrst")),aw("aw"),wd("wd"),br("br"){
 		aw.clk(clk);
@@ -2913,7 +2920,7 @@ public:
 	}
 };
 
-template<class CFG=amba3_axi_type, class AW_BF=NONBUFFERABLE, class WD_BF=NONBUFFERABLE, class BR_BF=NONBUFFERABLE>
+template<class CFG=amba3_axi_type>
 class amba3_axi_w_target_:public amba3_axi_aw_base_target<CFG>,public amba3_axi_wd_base_target<CFG>,public amba3_axi_br_base_target<CFG>{
 public:
 	typedef amba3_axi_aw_base_target<CFG> aw_type;
@@ -2923,9 +2930,9 @@ public:
 
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
-	amba3_axi_aw_target_<CFG,AW_BF> aw;
-	amba3_axi_wd_target_<CFG,WD_BF> wd;
-	amba3_axi_br_target_<CFG,BR_BF> br;
+	amba3_axi_aw_target_<CFG, typename CFG::AW_BF> aw;
+	amba3_axi_wd_target_<CFG, typename CFG::WD_BF> wd;
+	amba3_axi_br_target_<CFG, typename CFG::BR_BF> br;
 
 	amba3_axi_w_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_w_target_")):clk(PIN_NAME(name,"clk")),nrst(PIN_NAME(name,"nrst")),aw("aw"),wd("wd"),br("br"){
 		aw.clk(clk);
@@ -2980,7 +2987,7 @@ public:
 	}
 };
 
-template<class CFG=amba3_axi_type,class AR_BF=NONBUFFERABLE, class RD_BF=NONBUFFERABLE>
+template<class CFG=amba3_axi_type>
 class amba3_axi_r_initiator_:public amba3_axi_ar_base_initiator<CFG>,public amba3_axi_rd_base_initiator<CFG>{
 public:
 	typedef amba3_axi_ar_base_initiator<CFG> ar_type;
@@ -2988,8 +2995,8 @@ public:
 
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
-	amba3_axi_ar_initiator_<CFG,AR_BF> ar;
-	amba3_axi_rd_initiator_<CFG,RD_BF> rd;
+	amba3_axi_ar_initiator_<CFG, typename CFG::AR_BF> ar;
+	amba3_axi_rd_initiator_<CFG, typename CFG::RD_BF> rd;
 
 	SC_HAS_PROCESS(amba3_axi_r_initiator_);
 
@@ -3033,7 +3040,7 @@ public:
 	}
 };
 
-template<class CFG=amba3_axi_type,class AR_BF=NONBUFFERABLE, class RD_BF=NONBUFFERABLE>
+template<class CFG=amba3_axi_type>
 class amba3_axi_r_target_:public amba3_axi_ar_base_target<CFG>,public amba3_axi_rd_base_target<CFG>{
 
 public:
@@ -3042,8 +3049,8 @@ public:
 
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
-	amba3_axi_ar_target_<CFG,AR_BF> ar;
-	amba3_axi_rd_target_<CFG,RD_BF> rd;
+	amba3_axi_ar_target_<CFG, typename CFG::AR_BF> ar;
+	amba3_axi_rd_target_<CFG, typename CFG::RD_BF> rd;
 
 	SC_HAS_PROCESS(amba3_axi_r_target_);
 
@@ -3087,7 +3094,7 @@ public:
 	}
 };
 
-template<class CFG=amba3_axi_type, class AW_BF=NONBUFFERABLE, class WD_BF=NONBUFFERABLE, class BR_BF=NONBUFFERABLE, class AR_BF=NONBUFFERABLE, class RD_BF=NONBUFFERABLE>
+template<class CFG=amba3_axi_type>
 class amba3_axi_initiator_:
  public amba3_axi_aw_base_initiator<CFG>
 ,public amba3_axi_wd_base_initiator<CFG>
@@ -3106,11 +3113,11 @@ public:
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
 
-	amba3_axi_aw_initiator_<CFG,AW_BF> aw;
-	amba3_axi_wd_initiator_<CFG,WD_BF> wd;
-	amba3_axi_br_initiator_<CFG,BR_BF> br;
-	amba3_axi_ar_initiator_<CFG,AR_BF> ar;
-	amba3_axi_rd_initiator_<CFG,RD_BF> rd;
+	amba3_axi_aw_initiator_<CFG, typename CFG::AW_BF> aw;
+	amba3_axi_wd_initiator_<CFG, typename CFG::WD_BF> wd;
+	amba3_axi_br_initiator_<CFG, typename CFG::BR_BF> br;
+	amba3_axi_ar_initiator_<CFG, typename CFG::AR_BF> ar;
+	amba3_axi_rd_initiator_<CFG, typename CFG::RD_BF> rd;
 
 	amba3_axi_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_initiator_")):clk(PIN_NAME(name,"clk")),nrst(PIN_NAME(name,"nrst")),aw("aw"),wd("wd"),br("br"),ar("ar"),rd("rd"){
 		aw.clk(clk);
@@ -3198,7 +3205,7 @@ public:
 };
 
 
-template<class CFG=amba3_axi_type, class AW_BF=NONBUFFERABLE, class WD_BF=NONBUFFERABLE, class BR_BF=NONBUFFERABLE, class AR_BF=NONBUFFERABLE, class RD_BF=NONBUFFERABLE>
+template<class CFG=amba3_axi_type>
 class amba3_axi_target_:
  public amba3_axi_aw_base_target<CFG>
 ,public amba3_axi_wd_base_target<CFG>
@@ -3217,11 +3224,11 @@ public:
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
 
-	amba3_axi_aw_target_<CFG,AW_BF> aw;
-	amba3_axi_wd_target_<CFG,WD_BF> wd;
-	amba3_axi_br_target_<CFG,BR_BF> br;
-	amba3_axi_ar_target_<CFG,AR_BF> ar;
-	amba3_axi_rd_target_<CFG,RD_BF> rd;
+	amba3_axi_aw_target_<CFG, typename CFG::AW_BF> aw;
+	amba3_axi_wd_target_<CFG, typename CFG::WD_BF> wd;
+	amba3_axi_br_target_<CFG, typename CFG::BR_BF> br;
+	amba3_axi_ar_target_<CFG, typename CFG::AR_BF> ar;
+	amba3_axi_rd_target_<CFG, typename CFG::RD_BF> rd;
 
 
 	amba3_axi_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_target_")):clk(PIN_NAME(name,"clk")),nrst(PIN_NAME(name,"nrst")),aw("aw"),wd("wd"),br("br"),ar("ar"),rd("rd"){
@@ -3307,4 +3314,119 @@ public:
 		bind(c);
 	}
 };
+
+class request_if:public sc_interface{
+public:
+};
+
+class responce_if:public sc_interface{
+public:
+};
+
+
+template<class CFG=amba3_axi_type, class L=PIN>
+class amba3_axi_initiator:public sc_module, public amba3_axi_initiator_<CFG>{
+
+	typedef amba3_axi_initiator_<CFG> base_type;
+
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	sc_export<responce_if> responce_cb;
+
+	SC_HAS_PROCESS(amba3_axi_initiator);
+	amba3_axi_initiator(const sc_module_name& name=sc_gen_unique_name("amba3_axi_initiator")):sc_module(name){
+		base_type::clk(clk);
+		base_type::nrst(nrst);
+
+		SC_CTHREAD(wd_thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+
+		SC_CTHREAD(br_thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+
+		SC_CTHREAD(rd_thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+
+		end_module();
+	}
+
+	void wd_thread(){
+		base_type::wd_reset();
+		wait();
+
+		while( true ){
+			amba3_axi_wd_type<CFG> wd;
+			base_type::b_put_wd(wd);
+		}
+	}
+
+	void br_thread(){
+		base_type::br_reset();
+		wait();
+
+		while( true ){
+			amba3_axi_resp_type<CFG> br;
+			base_type::b_get_br(br);
+		}
+	}
+
+
+	void rd_thread(){
+		base_type::rd_reset();
+		wait();
+
+		while( true ){
+			amba3_axi_rd_type<CFG> rd;
+			base_type::b_get_rd(rd);
+		}
+	}
+};
+
+template<class CFG=amba3_axi_type, class L=PIN>
+class amba3_axi_target:public sc_module, public amba3_axi_target_<CFG>{
+
+	typedef amba3_axi_target_<CFG> base_type;
+
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	sc_export<request_if> request_cb;
+
+	SC_HAS_PROCESS(amba3_axi_target);
+	amba3_axi_target(const sc_module_name& name=sc_gen_unique_name("amba3_axi_target")):sc_module(name){
+		base_type::clk(clk);
+		base_type::nrst(nrst);
+
+		SC_CTHREAD(addr_thread,clk.pos());
+		reset_signal_is(nrst,false);
+
+		SC_CTHREAD(wd_thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+
+		end_module();
+	}
+
+	void addr_thread(){
+		base_type::aw_reset();
+		base_type::ar_reset();
+		wait();
+
+		while( true ){
+
+			wait();
+		}
+	}
+
+	void wd_thread(){
+		base_type::wd_reset();
+		wait();
+
+		while( true ){
+			amba3_axi_wd_type<CFG> wd;
+			base_type::b_get_wd(wd);
+		}
+	}
+};
+
 #endif /* AMBA3_AXI_IF_H_ */
