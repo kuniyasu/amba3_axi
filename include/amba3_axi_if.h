@@ -127,6 +127,7 @@ public:
 
 	void reset(){}
 
+	//TODO: implementation systemc data stuct method.
 };
 
 template<class CFG=amba3_axi_type> class amba3_axi_wd_type{
@@ -149,6 +150,8 @@ public:
 
 	void reset(){}
 
+	//TODO: implementation systemc data stuct method.
+
 };
 
 template<class CFG=amba3_axi_type> class amba3_axi_rd_type{
@@ -170,6 +173,9 @@ public:
 	}
 
 	void reset(){}
+
+	//TODO: implementation systemc data stuct method.
+
 };
 
 template<class CFG=amba3_axi_type> class amba3_axi_resp_type{
@@ -187,6 +193,9 @@ public:
 	}
 
 	void reset(){}
+
+	//TODO: implementation systemc data stuct method.
+
 };
 
 
@@ -1270,6 +1279,19 @@ public:
 		return condition;
 	}
 
+	template<class C> void bind(C& c){
+		base_type::rvalid(c.rvalid);
+		base_type::rid(c.rid);
+		base_type::rlast(c.rlast);
+		base_type::rresp(c.rresp);
+		base_type::rdata(c.rdata);
+		base_type::rready(c.rready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+
 };
 
 
@@ -1326,6 +1348,20 @@ public:
 		return condition;
 	}
 
+	template<class C> void bind(C& c){
+		base_type::rvalid(c.rvalid);
+		base_type::rid(c.rid);
+		base_type::rlast(c.rlast);
+		base_type::rresp(c.rresp);
+		base_type::rdata(c.rdata);
+		base_type::rready(c.rready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+
+
 };
 
 template<class CFG=amba3_axi_type,class BF=NONBUFFERABLE> class amba3_axi_br_initiator_:public sc_module, public amba3_axi_br_base_initiator<CFG>{
@@ -1366,6 +1402,18 @@ public:
 
 		return condition;
 	}
+
+	template<class C> void bind(C& c){
+		base_type::bvalid(c.bvalid);
+		base_type::bid(c.bid);
+		base_type::bresp(c.bresp);
+		base_type::bready(c.bready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+
 };
 
 
@@ -1412,6 +1460,17 @@ public:
 		condition = base_type::bready.read();
 
 		return condition;
+	}
+
+	template<class C> void bind(C& c){
+		base_type::bvalid(c.bvalid);
+		base_type::bid(c.bid);
+		base_type::bresp(c.bresp);
+		base_type::bready(c.bready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
 	}
 };
 
@@ -2185,6 +2244,7 @@ public:
 		_rd_reset();
 		fifo.w_reset();
 		wait();
+
 		while( true ){
 			data_type dt;
 			_b_get_rd(dt);
@@ -2209,6 +2269,20 @@ public:
 
 		dt = _dt;
 	}
+
+	template<class C> void bind(C& c){
+		base_type::rvalid(c.rvalid);
+		base_type::rid(c.rid);
+		base_type::rlast(c.rlast);
+		base_type::rresp(c.rresp);
+		base_type::rdata(c.rdata);
+		base_type::rready(c.rready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+
 };
 
 template<class CFG=amba3_axi_type> class amba3_axi_rd_initiator_<CFG,REGSLICE>:public sc_module, public amba3_axi_rd_base_initiator<CFG>{
@@ -2280,6 +2354,101 @@ public:
 			STALL( rready_sig.read() == false );
 		}
 	}
+
+	template<class C> void bind(C& c){
+		base_type::rvalid(c.rvalid);
+		base_type::rid(c.rid);
+		base_type::rlast(c.rlast);
+		base_type::rresp(c.rresp);
+		base_type::rdata(c.rdata);
+		base_type::rready(c.rready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+
+};
+
+
+template<class CFG=amba3_axi_type> class amba3_axi_rd_target_<CFG,BUFFERABLE>:public sc_module, public amba3_axi_rd_base_target<CFG>{
+public:
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	typedef amba3_axi_rd_base_target<CFG> base_type;
+	typedef amba3_axi_rd_type<CFG> data_type;
+
+	syn_channel_in<data_type, CFG::R_FIFO_SIZE, CFG::R_FIFO_CNT_WIDTH> fifo;
+
+	//TODO: Implement methods
+	SC_HAS_PROCESS(amba3_axi_rd_target_);
+	amba3_axi_rd_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_rd_target_")):sc_module(name),base_type(name){
+		SC_CTHREAD(thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+		end_module();
+	}
+
+	virtual void rd_reset(){
+		fifo.w_reset();
+	}
+
+	virtual void b_put_rd(const data_type& dt){
+		fifo.b_put(dt);
+	}
+
+	virtual bool nb_put_rd(const data_type& dt){
+		bool condition = false;
+		condition = fifo.b_put(dt);
+		return condition;
+	}
+
+
+	void thread(){
+		_rd_reset();
+		fifo.r_reset();
+		wait();
+
+		while( true ){
+			data_type dt;
+			fifo.b_get(dt);
+			_b_put_rd(dt);
+		}
+	}
+
+	virtual void _rd_reset(){
+		data_type rd = data_type();
+
+		base_type::rvalid.write(false);
+		base_type::rid.write(rd.id);
+		base_type::rlast.write(rd.last);
+		base_type::rresp.write(rd.resp);
+		base_type::rdata.write(rd.data);
+	}
+
+	virtual void _b_put_rd(const data_type& rd){
+		base_type::rvalid.write(true);
+		base_type::rid.write(rd.id);
+		base_type::rlast.write(rd.last);
+		base_type::rresp.write(rd.resp);
+		base_type::rdata.write(rd.data);
+		STALL(base_type::rready.read() == false);
+		base_type::rvalid.write(false);
+	}
+
+	template<class C> void bind(C& c){
+		base_type::rvalid(c.rvalid);
+		base_type::rid(c.rid);
+		base_type::rlast(c.rlast);
+		base_type::rresp(c.rresp);
+		base_type::rdata(c.rdata);
+		base_type::rready(c.rready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+
 };
 
 template<class CFG=amba3_axi_type> class amba3_axi_br_initiator_<CFG,BUFFERABLE>:public sc_module, public amba3_axi_br_base_initiator<CFG>{
@@ -2340,8 +2509,18 @@ public:
 		_dt.resp = base_type::bresp.read();
 		dt = _dt;
 	}
-};
 
+	template<class C> void bind(C& c){
+		base_type::bvalid(c.bvalid);
+		base_type::bid(c.bid);
+		base_type::bresp(c.bresp);
+		base_type::bready(c.bready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
 
 
 
@@ -2412,7 +2591,93 @@ public:
 		}
 	}
 
+	template<class C> void bind(C& c){
+		base_type::bvalid(c.bvalid);
+		base_type::bid(c.bid);
+		base_type::bresp(c.bresp);
+		base_type::bready(c.bready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
 };
+
+
+template<class CFG=amba3_axi_type> class amba3_axi_br_target_<CFG,BUFFERABLE>:public sc_module, public amba3_axi_br_base_target<CFG>{
+public:
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	typedef amba3_axi_br_base_target<CFG> base_type;
+	typedef amba3_axi_resp_type<CFG> data_type;
+
+	syn_channel_in<data_type, CFG::B_FIFO_SIZE, CFG::B_FIFO_CNT_WIDTH> fifo;
+
+	SC_HAS_PROCESS(amba3_axi_br_target_);
+	amba3_axi_br_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_br_target_")):sc_module(name),base_type(name){
+		SC_CTHREAD(thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+
+		end_module();
+	}
+
+	virtual void br_reset(){
+		fifo.w_reset();
+	}
+
+	virtual void b_put_br(const data_type& dt){
+		fifo.b_put(dt);
+	}
+
+	virtual bool nb_put_br(const data_type& dt){
+		bool condition = false;
+		condition = fifo.nb_put(dt);
+		return condition;
+	}
+
+	void thread(){
+		fifo.r_reset();
+		_br_reset();
+		wait();
+
+		while( true ){
+			data_type dt;
+			fifo.b_get(dt);
+			_b_put_br(dt);
+		}
+	}
+
+	virtual void _br_reset(){
+		data_type br = data_type();
+		br.reset();
+
+		base_type::bvalid.write(false);
+		base_type::bid.write(br.id);
+		base_type::bresp.write(br.resp);
+	}
+
+	virtual void _b_put_br(const data_type& dt){
+		base_type::bid.write(dt.id);
+		base_type::bresp.write(dt.resp);
+
+		base_type::bvalid.write(true);
+		STALL(base_type::bready.read() == false);
+		base_type::bvalid.write(false);
+	}
+
+	template<class C> void bind(C& c){
+		base_type::bvalid(c.bvalid);
+		base_type::bid(c.bid);
+		base_type::bresp(c.bresp);
+		base_type::bready(c.bready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
+
 
 template<class CFG=amba3_axi_type, class AW_BF=NONBUFFERABLE, class WD_BF=NONBUFFERABLE, class BR_BF=NONBUFFERABLE>
 class amba3_axi_w_initiator_:public amba3_axi_aw_initiator_<CFG,AW_BF>,public amba3_axi_wd_initiator_<CFG,WD_BF>,public amba3_axi_br_initiator_<CFG,BR_BF>{
