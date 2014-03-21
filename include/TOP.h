@@ -16,7 +16,7 @@ public:
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
 
-	amba3_axi_initiator_<amba3_axi_type> put_if;
+	amba3_axi_initiator<amba3_axi_type> put_if;
 //	syn_fifo_3<sc_uint<4> >::put put_if;
 
 	SC_HAS_PROCESS(Producer);
@@ -52,7 +52,7 @@ public:
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
 
-	amba3_axi_target_<amba3_axi_type> get_if;
+	amba3_axi_target<amba3_axi_type> get_if;
 //	syn_fifo_3<sc_uint<4> >::get get_if;
 
 	SC_HAS_PROCESS(Consumer);
