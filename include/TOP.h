@@ -16,7 +16,7 @@ public:
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
 
-	amba3_axi_address_type a;
+	amba3_axi_aw_initiator_<> a;
 //	syn_fifo_3<sc_uint<4> >::put put_if;
 
 	SC_HAS_PROCESS(Producer);
