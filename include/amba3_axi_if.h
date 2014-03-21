@@ -3040,8 +3040,8 @@ public:
 };
 
 template<class CFG=amba3_axi_type, class AW_BF=NONBUFFERABLE, class WD_BF=NONBUFFERABLE, class BR_BF=NONBUFFERABLE, class AR_BF=NONBUFFERABLE, class RD_BF=NONBUFFERABLE>
-class amba3_axi_initiator_:public sc_module
-,public amba3_axi_aw_base_initiator<CFG>
+class amba3_axi_initiator_:
+ public amba3_axi_aw_base_initiator<CFG>
 ,public amba3_axi_wd_base_initiator<CFG>
 ,public amba3_axi_br_base_initiator<CFG>
 ,public amba3_axi_ar_base_initiator<CFG>
@@ -3064,7 +3064,7 @@ public:
 	amba3_axi_ar_initiator_<CFG,AR_BF> ar;
 	amba3_axi_rd_initiator_<CFG,RD_BF> rd;
 
-	amba3_axi_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_initiator_")):sc_module(name){
+	amba3_axi_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_initiator_")):aw("aw"){
 		aw.clk(clk);
 		aw.nrst(nrst);
 
@@ -3086,8 +3086,28 @@ public:
 		rd.bind(*this);
 		br.bind(*this);
 
-		end_module();
 	}
+
+	virtual void aw_reset(){ aw.aw_reset(); }
+	virtual void b_put_aw(const amba3_axi_address_type<CFG>& aw){ this->aw.b_put_aw(aw); }
+	virtual bool nb_put_aw(const amba3_axi_address_type<CFG>& aw){ return this->aw.nb_put_aw(aw); }
+
+	virtual void ar_reset(){ ar.ar_reset(); }
+	virtual void b_put_ar(const amba3_axi_address_type<CFG>& ar){ this->ar.b_put_ar(ar); }
+	virtual bool nb_put_ar(const amba3_axi_address_type<CFG>& ar){ return this->ar.nb_put_ar(ar); }
+
+	virtual void wd_reset(){ wd.wd_reset(); }
+	virtual void b_put_wd(const amba3_axi_wd_type<CFG>& wd){ this->wd.b_put_wd(wd); }
+	virtual bool nb_put_wd(const amba3_axi_wd_type<CFG>& wd){ return this->wd.nb_put_wd(wd); }
+
+	virtual void rd_reset(){ rd.rd_reset(); }
+	virtual void b_get_rd( amba3_axi_rd_type<CFG>& rd){ this->rd.b_get_rd(rd); }
+	virtual bool nb_get_rd( amba3_axi_rd_type<CFG>& rd){ return this->rd.nb_get_rd(rd); }
+
+	virtual void br_reset(){ br.br_reset(); }
+	virtual void b_get_br( amba3_axi_resp_type<CFG>& br){ this->br.b_get_br(br); }
+	virtual bool nb_get_br( amba3_axi_resp_type<CFG>& br){ return this->br.nb_get_br(br); }
+
 
 	template<class C> void bind(C& c){
 		aw_type::awvalid(c.awvalid);
@@ -3131,8 +3151,8 @@ public:
 
 
 template<class CFG=amba3_axi_type, class AW_BF=NONBUFFERABLE, class WD_BF=NONBUFFERABLE, class BR_BF=NONBUFFERABLE, class AR_BF=NONBUFFERABLE, class RD_BF=NONBUFFERABLE>
-class amba3_axi_target_:public sc_module
-,public amba3_axi_aw_base_target<CFG>
+class amba3_axi_target_:
+ public amba3_axi_aw_base_target<CFG>
 ,public amba3_axi_wd_base_target<CFG>
 ,public amba3_axi_br_base_target<CFG>
 ,public amba3_axi_ar_base_target<CFG>
@@ -3156,7 +3176,7 @@ public:
 	amba3_axi_rd_target_<CFG,RD_BF> rd;
 
 
-	amba3_axi_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_target_")):sc_module(name),aw("aw"){
+	amba3_axi_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_target_")):aw("aw"){
 		aw.clk(clk);
 		aw.nrst(nrst);
 
@@ -3178,6 +3198,27 @@ public:
 		rd.bind(*this);
 		br.bind(*this);
 	}
+
+	virtual void aw_reset(){ aw.aw_reset(); }
+	virtual void b_get_aw( amba3_axi_address_type<CFG>& aw){ this->aw.b_get_aw(aw); }
+	virtual bool nb_get_aw( amba3_axi_address_type<CFG>& aw){ return this->aw.nb_get_aw(aw); }
+
+	virtual void ar_reset(){ ar.ar_reset(); }
+	virtual void b_get_ar( amba3_axi_address_type<CFG>& ar){ this->ar.b_get_ar(ar); }
+	virtual bool nb_get_ar( amba3_axi_address_type<CFG>& ar){ return this->ar.nb_get_ar(ar); }
+
+	virtual void wd_reset(){ wd.wd_reset(); }
+	virtual void b_get_wd( amba3_axi_wd_type<CFG>& wd){ this->wd.b_get_wd(wd); }
+	virtual bool nb_get_wd( amba3_axi_wd_type<CFG>& wd){ return this->wd.nb_get_wd(wd); }
+
+	virtual void rd_reset(){ rd.rd_reset(); }
+	virtual void b_put_rd(const amba3_axi_rd_type<CFG>& rd){ this->rd.b_put_rd(rd); }
+	virtual bool nb_put_rd(const amba3_axi_rd_type<CFG>& rd){ return this->rd.nb_put_rd(rd); }
+
+	virtual void br_reset(){ br.br_reset(); }
+	virtual void b_put_br(const amba3_axi_resp_type<CFG>& br){ this->br.b_put_br(br); }
+	virtual bool nb_put_br(const amba3_axi_resp_type<CFG>& br){ return this->br.nb_put_br(br); }
+
 
 	template<class C> void bind(C& c){
 		aw_type::awvalid(c.awvalid);
