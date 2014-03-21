@@ -3040,12 +3040,13 @@ public:
 };
 
 template<class CFG=amba3_axi_type, class AW_BF=NONBUFFERABLE, class WD_BF=NONBUFFERABLE, class BR_BF=NONBUFFERABLE, class AR_BF=NONBUFFERABLE, class RD_BF=NONBUFFERABLE>
-class amba3_axi_initiator_:
-public amba3_axi_aw_initiator_<CFG,AW_BF>
-,public amba3_axi_wd_initiator_<CFG,WD_BF>
-,public amba3_axi_br_initiator_<CFG,BR_BF>
-,public amba3_axi_ar_initiator_<CFG,AR_BF>
-,public amba3_axi_rd_initiator_<CFG,RD_BF>{
+class amba3_axi_initiator_:public sc_module
+,public amba3_axi_aw_base_initiator<CFG>
+,public amba3_axi_wd_base_initiator<CFG>
+,public amba3_axi_br_base_initiator<CFG>
+,public amba3_axi_ar_base_initiator<CFG>
+,public amba3_axi_rd_base_initiator<CFG>{
+
 public:
 	typedef amba3_axi_aw_base_initiator<CFG> aw_type;
 	typedef amba3_axi_wd_base_initiator<CFG> wd_type;
@@ -3057,26 +3058,35 @@ public:
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
 
-	amba3_axi_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_initiator_"))
-	:amba3_axi_aw_initiator_<CFG,AW_BF>(name)
-	 ,amba3_axi_wd_initiator_<CFG,WD_BF>(name)
-	 ,amba3_axi_br_initiator_<CFG,BR_BF>(name)
-	 ,amba3_axi_ar_initiator_<CFG,AR_BF>(name)
-	 ,amba3_axi_rd_initiator_<CFG,RD_BF>(name){
+	amba3_axi_aw_initiator_<CFG,AW_BF> aw;
+	amba3_axi_wd_initiator_<CFG,WD_BF> wd;
+	amba3_axi_br_initiator_<CFG,BR_BF> br;
+	amba3_axi_ar_initiator_<CFG,AR_BF> ar;
+	amba3_axi_rd_initiator_<CFG,RD_BF> rd;
 
-		amba3_axi_aw_initiator_<CFG,AW_BF>::clk(clk);
-		amba3_axi_ar_initiator_<CFG,AR_BF>::clk(clk);
-		amba3_axi_wd_initiator_<CFG,WD_BF>::clk(clk);
-		amba3_axi_rd_initiator_<CFG,RD_BF>::clk(clk);
-		amba3_axi_br_initiator_<CFG,BR_BF>::clk(clk);
+	amba3_axi_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_initiator_")):sc_module(name){
+		aw.clk(clk);
+		aw.nrst(nrst);
 
-		amba3_axi_aw_initiator_<CFG,AW_BF>::nrst(nrst);
-		amba3_axi_ar_initiator_<CFG,AR_BF>::nrst(nrst);
-		amba3_axi_wd_initiator_<CFG,WD_BF>::nrst(nrst);
-		amba3_axi_rd_initiator_<CFG,RD_BF>::nrst(nrst);
-		amba3_axi_br_initiator_<CFG,BR_BF>::nrst(nrst);
+		ar.clk(clk);
+		ar.nrst(nrst);
 
-		//sc_module::end_module();
+		wd.clk(clk);
+		wd.nrst(nrst);
+
+		rd.clk(clk);
+		rd.nrst(nrst);
+
+		br.clk(clk);
+		br.nrst(nrst);
+
+		aw.bind(*this);
+		ar.bind(*this);
+		wd.bind(*this);
+		rd.bind(*this);
+		br.bind(*this);
+
+		end_module();
 	}
 
 	template<class C> void bind(C& c){
@@ -3121,7 +3131,14 @@ public:
 
 
 template<class CFG=amba3_axi_type, class AW_BF=NONBUFFERABLE, class WD_BF=NONBUFFERABLE, class BR_BF=NONBUFFERABLE, class AR_BF=NONBUFFERABLE, class RD_BF=NONBUFFERABLE>
-class amba3_axi_target_:public amba3_axi_aw_target_<CFG,AW_BF>,public amba3_axi_wd_target_<CFG,WD_BF>,public amba3_axi_br_target_<CFG,BR_BF>,public amba3_axi_ar_target_<CFG,AR_BF>,public amba3_axi_rd_target_<CFG,RD_BF>{
+class amba3_axi_target_:public sc_module
+,public amba3_axi_aw_base_target<CFG>
+,public amba3_axi_wd_base_target<CFG>
+,public amba3_axi_br_base_target<CFG>
+,public amba3_axi_ar_base_target<CFG>
+,public amba3_axi_rd_base_target<CFG>{
+
+
 public:
 	typedef amba3_axi_aw_base_target<CFG> aw_type;
 	typedef amba3_axi_wd_base_target<CFG> wd_type;
@@ -3129,32 +3146,37 @@ public:
 	typedef amba3_axi_ar_base_target<CFG> ar_type;
 	typedef amba3_axi_rd_base_target<CFG> rd_type;
 
-
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
 
-	amba3_axi_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_target_"))
-	:amba3_axi_aw_target_<CFG,AW_BF>(name)
-	 ,amba3_axi_wd_target_<CFG,WD_BF>(name)
-	 ,amba3_axi_br_target_<CFG,BR_BF>(name)
-	 ,amba3_axi_ar_target_<CFG,AR_BF>(name)
-	 ,amba3_axi_rd_target_<CFG,RD_BF>(name)
-	 {
+	amba3_axi_aw_target_<CFG,AW_BF> aw;
+	amba3_axi_wd_target_<CFG,WD_BF> wd;
+	amba3_axi_br_target_<CFG,BR_BF> br;
+	amba3_axi_ar_target_<CFG,AR_BF> ar;
+	amba3_axi_rd_target_<CFG,RD_BF> rd;
 
 
-		amba3_axi_aw_target_<CFG,AW_BF>::clk(clk);
-		amba3_axi_ar_target_<CFG,AR_BF>::clk(clk);
-		amba3_axi_wd_target_<CFG,WD_BF>::clk(clk);
-		amba3_axi_rd_target_<CFG,RD_BF>::clk(clk);
-		amba3_axi_br_target_<CFG,BR_BF>::clk(clk);
+	amba3_axi_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_target_")):sc_module(name),aw("aw"){
+		aw.clk(clk);
+		aw.nrst(nrst);
 
-		amba3_axi_aw_target_<CFG,AW_BF>::nrst(nrst);
-		amba3_axi_ar_target_<CFG,AR_BF>::nrst(nrst);
-		amba3_axi_wd_target_<CFG,WD_BF>::nrst(nrst);
-		amba3_axi_rd_target_<CFG,RD_BF>::nrst(nrst);
-		amba3_axi_br_target_<CFG,BR_BF>::nrst(nrst);
+		ar.clk(clk);
+		ar.nrst(nrst);
 
-//		sc_moule::end_module();
+		wd.clk(clk);
+		wd.nrst(nrst);
+
+		rd.clk(clk);
+		rd.nrst(nrst);
+
+		br.clk(clk);
+		br.nrst(nrst);
+
+		aw.bind(*this);
+		ar.bind(*this);
+		wd.bind(*this);
+		rd.bind(*this);
+		br.bind(*this);
 	}
 
 	template<class C> void bind(C& c){
