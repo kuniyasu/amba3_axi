@@ -1496,6 +1496,164 @@ public:
 
 };
 
+template<class CFG=amba3_axi_type>class amba3_axi_aw_target_<CFG,BUFFERABLE>:public sc_module, public amba3_axi_aw_base_target<CFG>{
+public:
+	typedef amba3_axi_aw_base_target<CFG> base_type;
+	typedef amba3_axi_address_type<CFG> data_type;
+
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	syn_channel_in<data_type, CFG::AW_FIFO_SIZE, CFG::AW_FIFO_CNT_WIDTH> fifo;
+
+	SC_HAS_PROCESS(amba3_axi_aw_target_);
+	amba3_axi_aw_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_aw_target_")):sc_module(name),base_type(name){
+		SC_CTHREAD(thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+
+		end_module();
+	}
+
+	virtual void aw_reset(){
+		fifo.r_reset();
+	}
+
+	virtual void b_get_aw( amba3_axi_address_type<CFG>& aw ){
+		fifo.b_get(aw);
+	}
+
+	virtual bool nb_get_aw( amba3_axi_address_type<CFG>& aw ){
+		bool condition = false;
+		condition = fifo.nb_get(aw);
+		return condition;
+	}
+
+	void thread(){
+		_aw_reset();
+		fifo.w_reset();
+		wait();
+
+		while( true ){
+			amba3_axi_address_type<CFG> aw;
+			_b_get_awrite(aw);
+			fifo.b_put(aw);
+		}
+	}
+
+	virtual void _aw_reset(){
+		base_type::awready.write(false);
+	}
+
+	virtual void _b_get_aw( amba3_axi_address_type<CFG>& aw ){
+		amba3_axi_address_type<CFG> _aw = amba3_axi_address_type<CFG>();
+
+		base_type::awready.write(true);
+		STALL(base_type::awvalid.read() == false);
+		base_type::awready.write(false);
+
+		_aw.id = base_type::awid.read();
+		_aw.addr = base_type::awaddr.read();
+		_aw.len = base_type::awlen.read();
+		_aw.size = base_type::awsize.read();
+	}
+
+	template<class C> void bind(C& c){
+		base_type::awvalid(c.awvalid);
+		base_type::awid(c.awid);
+		base_type::awaddr(c.awaddr);
+		base_type::awlen(c.awlen);
+		base_type::awsize(c.awsize);
+		base_type::awready(c.awready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+
+};
+
+template<class CFG=amba3_axi_type>class amba3_axi_aw_target_<CFG,REGSLICE>:public sc_module, public amba3_axi_aw_base_target<CFG>{
+public:
+	typedef amba3_axi_aw_base_target<CFG> base_type;
+	typedef amba3_axi_address_type<CFG> data_type;
+
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	sc_signal<bool> awvalid_sig;
+	sc_signal<data_type> reg_slice;
+	sc_signal<bool> awready_sig;
+
+	SC_HAS_PROCESS(amba3_axi_aw_target_);
+	amba3_axi_aw_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_aw_target_")):sc_module(name),base_type(name){
+		SC_CTHREAD(reg_slice_thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+
+		end_module();
+	}
+
+	virtual void aw_reset(){
+		base_type::awready.write(false);
+		awready_sig.write(false);
+	}
+
+	virtual void b_get_aw( amba3_axi_address_type<CFG>& aw ){
+		base_type::awready.write(true);
+		awready_sig.write(true);
+		STALL(awvalid_sig.read() == false);
+		base_type::awready.write(false);
+		awready_sig.write(false);
+
+		aw = reg_slice.read();
+	}
+
+	virtual bool nb_get_aw( amba3_axi_address_type<CFG>& aw ){
+		bool condition = false;
+
+		base_type::awready.write(true);
+		awready_sig.write(true);
+		wait();
+		base_type::awready.write(false);
+		awready_sig.write(false);
+		aw = reg_slice.read();
+		condition = awvalid_sig.read();
+
+		return condition;
+	}
+
+	void reg_slice_thread(){
+		amba3_axi_address_type<CFG> aw = amba3_axi_address_type<CFG>();
+		awvalid_sig.write(false);
+		reg_slice.write(wd);
+		wait();
+
+		while( true ){
+			aw.reset();
+
+			awvalid_sig.write(base_type::awvalid.read());
+			aw.id = base_type::awid.read();
+			aw.addr = base_type::awaddr.read();
+			aw.len  = base_type::awlen.read();
+			aw.size = base_type::awsize.read();
+
+			reg_slice.write(aw);
+			wait();
+		}
+	}
+
+	template<class C> void bind(C& c){
+		base_type::awvalid(c.awvalid);
+		base_type::awid(c.awid);
+		base_type::awaddr(c.awaddr);
+		base_type::awlen(c.awlen);
+		base_type::awsize(c.awsize);
+		base_type::awready(c.awready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
 
 template<class CFG=amba3_axi_type>class amba3_axi_ar_initiator_<CFG,BUFFERABLE>:public sc_module, public amba3_axi_ar_base_initiator<CFG>{
 public:
@@ -1576,6 +1734,165 @@ public:
 		bind(c);
 	}
 
+};
+
+template<class CFG=amba3_axi_type>class amba3_axi_ar_target_<CFG,BUFFERABLE>:public sc_module, public amba3_axi_ar_base_target<CFG>{
+public:
+	typedef amba3_axi_ar_base_target<CFG> base_type;
+	typedef amba3_axi_address_type<CFG> data_type;
+
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	syn_channel_in<data_type, CFG::ar_FIFO_SIZE, CFG::ar_FIFO_CNT_WIDTH> fifo;
+
+	SC_HAS_PROCESS(amba3_axi_ar_target_);
+	amba3_axi_ar_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_ar_target_")):sc_module(name),base_type(name){
+		SC_CTHREAD(thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+
+		end_module();
+	}
+
+	virtual void ar_reset(){
+		fifo.r_reset();
+	}
+
+	virtual void b_get_ar( amba3_axi_address_type<CFG>& ar ){
+		fifo.b_get(ar);
+	}
+
+	virtual bool nb_get_ar( amba3_axi_address_type<CFG>& ar ){
+		bool condition = false;
+		condition = fifo.nb_get(ar);
+		return condition;
+	}
+
+	void thread(){
+		_ar_reset();
+		fifo.w_reset();
+		wait();
+
+		while( true ){
+			amba3_axi_address_type<CFG> ar;
+			_b_get_arrite(ar);
+			fifo.b_put(ar);
+		}
+	}
+
+	virtual void _ar_reset(){
+		base_type::arready.write(false);
+	}
+
+	virtual void _b_get_ar( amba3_axi_address_type<CFG>& ar ){
+		amba3_axi_address_type<CFG> _ar = amba3_axi_address_type<CFG>();
+
+		base_type::arready.write(true);
+		STALL(base_type::arvalid.read() == false);
+		base_type::arready.write(false);
+
+		_ar.id = base_type::arid.read();
+		_ar.addr = base_type::araddr.read();
+		_ar.len = base_type::arlen.read();
+		_ar.size = base_type::arsize.read();
+	}
+
+	template<class C> void bind(C& c){
+		base_type::arvalid(c.arvalid);
+		base_type::arid(c.arid);
+		base_type::araddr(c.araddr);
+		base_type::arlen(c.arlen);
+		base_type::arsize(c.arsize);
+		base_type::arready(c.arready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+
+};
+
+template<class CFG=amba3_axi_type>class amba3_axi_ar_target_<CFG,REGSLICE>:public sc_module, public amba3_axi_ar_base_target<CFG>{
+public:
+	typedef amba3_axi_ar_base_target<CFG> base_type;
+	typedef amba3_axi_address_type<CFG> data_type;
+
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	sc_signal<bool> arvalid_sig;
+	sc_signal<data_type> reg_slice;
+	sc_signal<bool> arready_sig;
+
+	SC_HAS_PROCESS(amba3_axi_ar_target_);
+	amba3_axi_ar_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_ar_target_")):sc_module(name),base_type(name){
+		SC_CTHREAD(reg_slice_thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+
+		end_module();
+	}
+
+	virtual void ar_reset(){
+		base_type::arready.write(false);
+		arready_sig.write(false);
+	}
+
+	virtual void b_get_ar( amba3_axi_address_type<CFG>& ar ){
+		base_type::arready.write(true);
+		arready_sig.write(true);
+		STALL(arvalid_sig.read() == false);
+		base_type::arready.write(false);
+		arready_sig.write(false);
+
+		ar = reg_slice.read();
+	}
+
+	virtual bool nb_get_ar( amba3_axi_address_type<CFG>& ar ){
+		bool condition = false;
+
+		base_type::arready.write(true);
+		arready_sig.write(true);
+		wait();
+		base_type::arready.write(false);
+		arready_sig.write(false);
+		ar = reg_slice.read();
+		condition = arvalid_sig.read();
+
+		return condition;
+	}
+
+	void reg_slice_thread(){
+		amba3_axi_address_type<CFG> ar = amba3_axi_address_type<CFG>();
+		arvalid_sig.write(false);
+		reg_slice.write(wd);
+		wait();
+
+		while( true ){
+			ar.reset();
+
+			arvalid_sig.write(base_type::arvalid.read());
+			ar.id = base_type::arid.read();
+			ar.addr = base_type::araddr.read();
+			ar.len  = base_type::arlen.read();
+			ar.size = base_type::arsize.read();
+
+			reg_slice.write(ar);
+			wait();
+		}
+	}
+
+	template<class C> void bind(C& c){
+		base_type::arvalid(c.arvalid);
+		base_type::arid(c.arid);
+		base_type::araddr(c.araddr);
+		base_type::arlen(c.arlen);
+		base_type::arsize(c.arsize);
+		base_type::arready(c.arready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
 };
 
 
@@ -1660,6 +1977,176 @@ public:
 		bind(c);
 	}
 };
+
+
+template<class CFG=amba3_axi_type> class amba3_axi_wd_target_<CFG,BUFFERABLE>:public sc_module, public amba3_axi_wd_base_target<CFG>{
+public:
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	typedef amba3_axi_wd_base_target<CFG> base_type;
+	typedef amba3_axi_wd_type<CFG> data_type;
+
+	syn_channel_in<data_type, CFG::W_FIFO_SIZE, CFG::W_FIFO_CNT_WIDTH> fifo;
+
+	//TODO: Implement methods
+	SC_HAS_PROCESS(amba3_axi_wd_target_);
+	amba3_axi_wd_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_wd_target_")):sc_module(name),base_type(name){
+		SC_CTHREAD(thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+
+		end_module();
+	}
+
+	virtual void wd_reset(){
+		fifo.r_reset();
+	}
+
+	virtual void b_get_wd(amba3_axi_wd_type<CFG>& wd){
+		fifo.b_put(wd);
+	}
+
+	virtual bool nb_get_wd(amba3_axi_wd_type<CFG>& wd){
+		bool condition = false;
+		condition = fifo.nb_get(wd);
+		return condition;
+	}
+
+	void thread(){
+		fifo.w_reset();
+		_wd_reset();
+		wait();
+
+		while( true ){
+			amba3_axi_wd_type<CFG> wd;
+			_b_get_wd(wd);
+			fifo.b_put(wd);
+		}
+	}
+
+	virtual void _wd_reset(){
+		base_type::wready.write(false);
+	}
+
+	virtual void _b_get_wd(amba3_axi_wd_type<CFG>& wd){
+		amba3_axi_wd_type<CFG> _wd = amba3_axi_wd_type<CFG>();
+
+		base_type::wready.write(true);
+		STALL(base_type::awvalid.read() == false);
+		base_type::wready.write(false);
+
+		_wd.id = base_type::wid.read();
+		_wd.last = base_type::wlast.read();
+		_wd.data = base_type::wdata.read();
+		_wd.strb = base_type::wstrb.read();
+
+		wd = _wd;
+	}
+
+	template<class C> void bind(C& c){
+		base_type::wvalid(c.wvalid);
+		base_type::wid(c.wid);
+		base_type::wlast(c.wlast);
+		base_type::wstrb(c.wstrb);
+		base_type::wdata(c.wdata);
+		base_type::wready(c.wready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
+
+
+template<class CFG=amba3_axi_type> class amba3_axi_wd_target_<CFG,REGSLICE>:public sc_module, public amba3_axi_wd_base_target<CFG>{
+public:
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	typedef amba3_axi_wd_base_target<CFG> base_type;
+	typedef amba3_axi_wd_type<CFG> data_type;
+
+	sc_signal<bool> wvalid_sig;
+	sc_signal<data_type> wd_sig;
+	sc_signal<bool> wready_sig;
+
+	//TODO: Implement methods
+	SC_HAS_PROCESS(amba3_axi_wd_target_);
+	amba3_axi_wd_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_wd_target_")):sc_module(name),base_type(name){
+		SC_CTHREAD(reg_slice_thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+
+		end_module();
+	}
+
+	virtual void wd_reset(){
+		wready_sig.write(false);
+		base_type::wready.write(false);
+	}
+
+	virtual void b_get_wd(amba3_axi_wd_type<CFG>& wd){
+
+		wready_sig.write(false);
+		base_type::wready.write(false);
+		STALL(wvalid_sig.read() == false);
+		wready_sig.write(false);
+		base_type::wready.write(false);
+
+		wd = wd_sig.read();
+
+	}
+
+	virtual bool nb_get_wd(amba3_axi_wd_type<CFG>& wd){
+		bool condition = false;
+
+		wready_sig.write(false);
+		base_type::wready.write(false);
+		wait();
+		wready_sig.write(false);
+		base_type::wready.write(false);
+
+		wd = wd_sig.read();
+		condition = wvalid_sig.read();
+
+		return condition;
+	}
+
+	void reg_slice_thread(){
+		amba3_axi_wd_type<CFG> wd = amba3_axi_wd_type<CFG>();
+
+ 		wvalid_sig.write(false);
+		wd_sig.write(wd);
+ 		wait();
+
+		while( true ){
+
+			wvalid_sig.write(base_type::wvalid.read());
+
+			wd.id = base_type::wid.read();
+			wd.last = base_type::wlast.read();
+			wd.strb = base_type::wstrb.read();
+			wd.data = base_type::wdata.read();
+			wd_sig.write(wd);
+
+			STALL(wready_sig.read() == false);
+		}
+	}
+
+
+	template<class C> void bind(C& c){
+		base_type::wvalid(c.wvalid);
+		base_type::wid(c.wid);
+		base_type::wlast(c.wlast);
+		base_type::wstrb(c.wstrb);
+		base_type::wdata(c.wdata);
+		base_type::wready(c.wready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
+
 
 template<class CFG=amba3_axi_type> class amba3_axi_rd_initiator_<CFG,BUFFERABLE>:public sc_module, public amba3_axi_rd_base_initiator<CFG>{
 public:
