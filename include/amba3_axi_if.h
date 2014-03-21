@@ -1724,67 +1724,6 @@ public:
 	}
 };
 
-template<class CFG=amba3_axi_type> class amba3_axi_br_initiator_<CFG,BUFFERABLE>:public sc_module, public amba3_axi_br_base_initiator<CFG>{
-public:
-	sc_in<bool> clk;
-	sc_in<bool> nrst;
-
-	typedef amba3_axi_br_base_initiator<CFG> base_type;
-	typedef amba3_axi_resp_type<CFG> data_type;
-
-	syn_channel_in<data_type, CFG::B_FIFO_SIZE, CFG::B_FIFO_CNT_WIDTH> fifo;
-
-	SC_HAS_PROCESS(amba3_axi_br_initiator_);
-	amba3_axi_br_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_br_initiator_")):sc_module(name),base_type(name){
-		SC_CTHREAD(thread,clk.pos());
-		async_reset_signal_is(nrst,false);
-
-		end_module();
-	}
-
-	virtual void br_reset(){
-		fifo.r_reset();
-	}
-
-	virtual void b_get_br(data_type& dt){
-		fifo.b_get(dt);
-	}
-
-	virtual bool nb_get_br(data_type& dt){
-		bool condition = false;
-		condition = fifo.nb_get(dt);
-		return condition;
-	}
-
-	void thread(){
-		fifo.w_reset();
-		_br_reset();
-		wait();
-
-		while( true ){
-			data_type dt;
-			_b_get_br(dt);
-			fifo.b_put(dt);
-		}
-	}
-
-	virtual void _br_reset(){
-		base_type::bready.write(false);
-	}
-
-	virtual void _b_get_br(data_type& dt){
-		base_type::bready.write(true);
-		STALL(base_type::bvalid.read() == false);
-		base_type::bready.write(false);
-
-		data_type _dt;
-		_dt.id = base_type::bid.read();
-		_dt.resp = base_type::bresp.read();
-		dt = _dt;
-	}
-};
-
-
 template<class CFG=amba3_axi_type> class amba3_axi_rd_initiator_<CFG,REGSLICE>:public sc_module, public amba3_axi_rd_base_initiator<CFG>{
 public:
 	sc_in<bool> clk;
@@ -1855,6 +1794,68 @@ public:
 		}
 	}
 };
+
+template<class CFG=amba3_axi_type> class amba3_axi_br_initiator_<CFG,BUFFERABLE>:public sc_module, public amba3_axi_br_base_initiator<CFG>{
+public:
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	typedef amba3_axi_br_base_initiator<CFG> base_type;
+	typedef amba3_axi_resp_type<CFG> data_type;
+
+	syn_channel_in<data_type, CFG::B_FIFO_SIZE, CFG::B_FIFO_CNT_WIDTH> fifo;
+
+	SC_HAS_PROCESS(amba3_axi_br_initiator_);
+	amba3_axi_br_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_br_initiator_")):sc_module(name),base_type(name){
+		SC_CTHREAD(thread,clk.pos());
+		async_reset_signal_is(nrst,false);
+
+		end_module();
+	}
+
+	virtual void br_reset(){
+		fifo.r_reset();
+	}
+
+	virtual void b_get_br(data_type& dt){
+		fifo.b_get(dt);
+	}
+
+	virtual bool nb_get_br(data_type& dt){
+		bool condition = false;
+		condition = fifo.nb_get(dt);
+		return condition;
+	}
+
+	void thread(){
+		fifo.w_reset();
+		_br_reset();
+		wait();
+
+		while( true ){
+			data_type dt;
+			_b_get_br(dt);
+			fifo.b_put(dt);
+		}
+	}
+
+	virtual void _br_reset(){
+		base_type::bready.write(false);
+	}
+
+	virtual void _b_get_br(data_type& dt){
+		base_type::bready.write(true);
+		STALL(base_type::bvalid.read() == false);
+		base_type::bready.write(false);
+
+		data_type _dt;
+		_dt.id = base_type::bid.read();
+		_dt.resp = base_type::bresp.read();
+		dt = _dt;
+	}
+};
+
+
 
 
 template<class CFG=amba3_axi_type> class amba3_axi_br_initiator_<CFG,REGSLICE>:public sc_module, public amba3_axi_br_base_initiator<CFG>{
@@ -1939,6 +1940,14 @@ public:
 
 	amba3_axi_w_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_w_initiator_"))
 	:amba3_axi_aw_initiator_<CFG,AW_BF>(name),amba3_axi_wd_initiator_<CFG,WD_BF>(name),amba3_axi_br_initiator_<CFG,BR_BF>(name){
+		amba3_axi_aw_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_wd_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_br_initiator_<CFG,AW_BF>::clk(clk);
+
+		amba3_axi_aw_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_wd_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_br_initiator_<CFG,AW_BF>::nrst(nrst);
+
 		end_module();
 	}
 
@@ -1981,6 +1990,14 @@ public:
 
 	amba3_axi_w_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_w_target_"))
 	:amba3_axi_aw_target_<CFG,AW_BF>(name),amba3_axi_wd_target_<CFG,WD_BF>(name),amba3_axi_br_target_<CFG,BR_BF>(name){
+		amba3_axi_aw_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_wd_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_br_initiator_<CFG,AW_BF>::clk(clk);
+
+		amba3_axi_aw_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_wd_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_br_initiator_<CFG,AW_BF>::nrst(nrst);
+
 		end_module();
 	}
 
@@ -2023,6 +2040,12 @@ public:
 
 	amba3_axi_r_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_r_initiator_"))
 	:amba3_axi_ar_initiator_<CFG,AR_BF>(name),amba3_axi_rd_initiator_<RD_BF,CFG>(name){
+		amba3_axi_ar_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_rd_initiator_<CFG,AW_BF>::clk(clk);
+
+		amba3_axi_ar_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_rd_initiator_<CFG,AW_BF>::nrst(nrst);
+
 		end_module();
 	}
 
@@ -2060,6 +2083,13 @@ public:
 
 	amba3_axi_r_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_r_target_"))
 	:amba3_axi_ar_target_<CFG,AR_BF>(name),amba3_axi_rd_target_<RD_BF,CFG>(name){
+		amba3_axi_ar_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_rd_initiator_<CFG,AW_BF>::clk(clk);
+
+		amba3_axi_ar_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_rd_initiator_<CFG,AW_BF>::nrst(nrst);
+
+
 		end_module();
 	}
 
@@ -2103,6 +2133,19 @@ public:
 	 ,amba3_axi_br_initiator_<CFG,BR_BF>(name)
 	 ,amba3_axi_wd_initiator_<CFG,WD_BF>(name)
 	 ,amba3_axi_br_initiator_<CFG,BR_BF>(name){
+
+		amba3_axi_aw_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_ar_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_wd_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_rd_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_br_initiator_<CFG,AW_BF>::clk(clk);
+
+		amba3_axi_aw_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_ar_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_wd_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_rd_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_br_initiator_<CFG,AW_BF>::nrst(nrst);
+
 		end_module();
 	}
 
@@ -2166,6 +2209,19 @@ public:
 	 ,amba3_axi_br_target_<CFG,BR_BF>(name)
 	 ,amba3_axi_wd_target_<CFG,WD_BF>(name)
 	 ,amba3_axi_br_target_<CFG,BR_BF>(name){
+
+		amba3_axi_aw_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_ar_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_wd_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_rd_initiator_<CFG,AW_BF>::clk(clk);
+		amba3_axi_br_initiator_<CFG,AW_BF>::clk(clk);
+
+		amba3_axi_aw_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_ar_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_wd_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_rd_initiator_<CFG,AW_BF>::nrst(nrst);
+		amba3_axi_br_initiator_<CFG,AW_BF>::nrst(nrst);
+
 		end_module();
 	}
 
