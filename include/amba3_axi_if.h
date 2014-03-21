@@ -967,6 +967,7 @@ public:
 
 	void thread(){
 		_ar_reset();
+		fifo.r_reset();
 		wait();
 
 		while( true ){
