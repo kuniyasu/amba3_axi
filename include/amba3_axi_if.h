@@ -109,6 +109,8 @@ public:
 
 template<class CFG=amba3_axi_type> class amba3_axi_address_type{
 public:
+	typedef amba3_axi_address_type<CFG> this_type;
+
 	CFG::id_type id;
 	CFG::addr_type addr;
 	CFG::len_type len;
@@ -128,10 +130,35 @@ public:
 	void reset(){}
 
 	//TODO: implementation systemc data stuct method.
+
+    inline bool operator == (const this_type& i) const {
+    	return (this->id == i.id)&&(this->addr == i.addr)&&(this->len == i.len)&&(this->size == i.size);
+    }
+
+    inline this_type& operator = (const this_type& i) {
+    	this->id = i.id;
+    	this->addr = i.addr;
+    	this->len = i.len;
+    	this->size = i.size;
+
+      return *this;
+    }
+
+    inline friend void sc_trace(sc_trace_file *tf, const this_type & v, const std::string & NAME ) {
+//      sc_trace(tf,v.info, NAME + ".info");
+//      sc_trace(tf,v.flag, NAME + ".flag");
+    }
+
+    inline friend ostream& operator << ( ostream& os,  this_type const & v ) {
+      //os << "(" << v.info << "," << std::boolalpha << v.flag << ")";
+      return os;
+    }
 };
 
 template<class CFG=amba3_axi_type> class amba3_axi_wd_type{
 public:
+	typedef amba3_axi_wd_type<CFG> this_type;
+
 	CFG::id_type id;
 	bool last;
 	CFG::strb_type strb;
@@ -151,11 +178,34 @@ public:
 	void reset(){}
 
 	//TODO: implementation systemc data stuct method.
+    inline bool operator == (const this_type& i) const {
+    	return (this->id == i.id)&&(this->last == i.last)&&(this->strb == i.strb)&&(this->data == i.data);
+    }
 
+    inline this_type& operator = (const this_type& i) {
+    	this->id = i.id;
+    	this->last = i.last;
+    	this->strb = i.strb;
+    	this->data = i.data;
+
+      return *this;
+    }
+
+    inline friend void sc_trace(sc_trace_file *tf, const this_type & v, const std::string & NAME ) {
+//      sc_trace(tf,v.info, NAME + ".info");
+//      sc_trace(tf,v.flag, NAME + ".flag");
+    }
+
+    inline friend ostream& operator << ( ostream& os,  this_type const & v ) {
+      //os << "(" << v.info << "," << std::boolalpha << v.flag << ")";
+      return os;
+    }
 };
 
 template<class CFG=amba3_axi_type> class amba3_axi_rd_type{
 public:
+	typedef amba3_axi_rd_type<CFG> this_type;
+
 	CFG::id_type id;
 	bool last;
 	CFG::resp_type resp;
@@ -175,11 +225,34 @@ public:
 	void reset(){}
 
 	//TODO: implementation systemc data stuct method.
+    inline bool operator == (const this_type& i) const {
+    	return (this->id == i.id)&&(this->last == i.last)&&(this->resp == i.resp)&&(this->data == i.data);
+    }
 
+    inline this_type& operator = (const this_type& i) {
+    	this->id = i.id;
+    	this->last = i.last;
+    	this->resp = i.resp;
+    	this->data = i.data;
+
+      return *this;
+    }
+
+    inline friend void sc_trace(sc_trace_file *tf, const this_type & v, const std::string & NAME ) {
+//      sc_trace(tf,v.info, NAME + ".info");
+//      sc_trace(tf,v.flag, NAME + ".flag");
+    }
+
+    inline friend ostream& operator << ( ostream& os,  this_type const & v ) {
+      //os << "(" << v.info << "," << std::boolalpha << v.flag << ")";
+      return os;
+    }
 };
 
 template<class CFG=amba3_axi_type> class amba3_axi_resp_type{
 public:
+	typedef amba3_axi_resp_type<CFG> this_type;
+
 	CFG::id_type id;
 	CFG::resp_type resp;
 
@@ -195,18 +268,91 @@ public:
 	void reset(){}
 
 	//TODO: implementation systemc data stuct method.
+    inline bool operator == (const this_type& i) const {
+    	return (this->id == i.id)&&(this->resp == i.resp);
+    }
 
+    inline this_type& operator = (const this_type& i) {
+    	this->id = i.id;
+    	this->resp = i.resp;
+    	return *this;
+    }
+
+    inline friend void sc_trace(sc_trace_file *tf, const this_type & v, const std::string & NAME ) {
+//      sc_trace(tf,v.info, NAME + ".info");
+//      sc_trace(tf,v.flag, NAME + ".flag");
+    }
+
+    inline friend ostream& operator << ( ostream& os,  this_type const & v ) {
+      //os << "(" << v.info << "," << std::boolalpha << v.flag << ")";
+      return os;
+    }
 };
 
 
-template<class CFG=amba3_axi_type> class amba3_axi_if:public sc_interface {
+template<class CFG=amba3_axi_type> class amba3_axi_aw_initiator_if_:public sc_interface {
 public:
-	virtual void write_axi_command() = 0;
-	virtual void read_axi_command() = 0;
+	typedef amba3_axi_address_type<CFG> data_type;
+	virtual void aw_reset() = 0;
+	virtual void b_put_aw(const data_type& aw) = 0;
+	virtual bool nb_put_aw(const data_type& aw) = 0;
+};
+
+template<class CFG=amba3_axi_type> class amba3_axi_ar_initiator_if_:public sc_interface {
+public:
+	typedef amba3_axi_address_type<CFG> data_type;
+	virtual void ar_reset() = 0;
+	virtual void b_put_ar(const data_type& ar) = 0;
+	virtual bool nb_put_ar(const data_type& ar) = 0;
+};
+
+template<class CFG=amba3_axi_type> class amba3_axi_wd_initiator_if_:public sc_interface {
+public:
+
+};
+
+template<class CFG=amba3_axi_type> class amba3_axi_rd_initiator_if_:public sc_interface {
+public:
+
+};
+
+template<class CFG=amba3_axi_type> class amba3_axi_br_initiator_if_:public sc_interface {
+public:
 
 };
 
 
+
+template<class CFG=amba3_axi_type> class amba3_axi_aw_target_if_:public sc_interface {
+public:
+	typedef amba3_axi_address_type<CFG> data_type;
+	virtual void aw_reset() = 0;
+	virtual void b_get_aw( data_type& aw) = 0;
+	virtual bool nb_get_aw( data_type& aw) = 0;
+};
+
+template<class CFG=amba3_axi_type> class amba3_axi_ar_target_if_:public sc_interface {
+public:
+	typedef amba3_axi_address_type<CFG> data_type;
+	virtual void ar_reset() = 0;
+	virtual void b_get_ar( data_type& aw) = 0;
+	virtual bool nb_get_ar( data_type& aw) = 0;
+};
+
+template<class CFG=amba3_axi_type> class amba3_axi_wd_target_if_:public sc_interface {
+public:
+
+};
+
+template<class CFG=amba3_axi_type> class amba3_axi_rd_target_if_:public sc_interface {
+public:
+
+};
+
+template<class CFG=amba3_axi_type> class amba3_axi_br_target_if_:public sc_interface {
+public:
+
+};
 
 template<class CFG=amba3_axi_type> class amba3_axi_aw_sig{
 public:
@@ -872,8 +1018,9 @@ public:
 
 
 
-template<class CFG=amba3_axi_type, class BF=NONBUFFERABLE>class amba3_axi_aw_initiator_:public sc_module, public amba3_axi_aw_base_initiator<CFG>{
+template<class CFG=amba3_axi_type, class BF=NONBUFFERABLE>class amba3_axi_aw_initiator_:public sc_module, public amba3_axi_aw_base_initiator<CFG>, public amba3_axi_aw_initiator_if_<CFG>{
 public:
+	typedef amba3_axi_aw_initiator_if_<CFG> if_type;
 	typedef amba3_axi_aw_base_initiator<CFG> base_type;
 	typedef amba3_axi_address_type<CFG> data_type;
 
@@ -934,8 +1081,9 @@ public:
 	}
 };
 
-template<class CFG=amba3_axi_type, class BF=NONBUFFERABLE>class amba3_axi_aw_target_:public sc_module, public amba3_axi_aw_base_target<CFG>{
+template<class CFG=amba3_axi_type, class BF=NONBUFFERABLE>class amba3_axi_aw_target_:public sc_module, public amba3_axi_aw_base_target<CFG>, public amba3_axi_aw_target_if_<CFG>{
 public:
+	typedef amba3_axi_aw_target_if_<CFG> if_type;
 	typedef amba3_axi_aw_base_target<CFG> base_type;
 	typedef amba3_axi_address_type<CFG> data_type;
 
@@ -998,8 +1146,9 @@ public:
 };
 
 
-template<class CFG=amba3_axi_type, class BF=NONBUFFERABLE>class amba3_axi_ar_initiator_:public sc_module, public amba3_axi_ar_base_initiator<CFG>{
+template<class CFG=amba3_axi_type, class BF=NONBUFFERABLE>class amba3_axi_ar_initiator_:public sc_module, public amba3_axi_ar_base_initiator<CFG>, public amba3_axi_ar_initiator_if_<CFG>{
 public:
+	typedef amba3_axi_ar_initiator_if_<CFG> if_type;
 	typedef amba3_axi_ar_base_initiator<CFG> base_type;
 	typedef amba3_axi_address_type<CFG> data_type;
 
@@ -1061,8 +1210,9 @@ public:
 
 };
 
-template<class CFG=amba3_axi_type, class BF=NONBUFFERABLE>class amba3_axi_ar_target_:public sc_module, public amba3_axi_ar_base_target<CFG>{
+template<class CFG=amba3_axi_type, class BF=NONBUFFERABLE>class amba3_axi_ar_target_:public sc_module, public amba3_axi_ar_base_target<CFG>, public amba3_axi_ar_target_if_<CFG>{
 public:
+	typedef amba3_axi_ar_target_if_<CFG> if_type;
 	typedef amba3_axi_ar_base_target<CFG> base_type;
 	typedef amba3_axi_address_type<CFG> data_type;
 
