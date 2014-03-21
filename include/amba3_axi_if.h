@@ -332,6 +332,39 @@ public:
 	}
 };
 
+
+template<class CFG=amba3_axi_type> class amba3_axi_aw_base_target{
+public:
+	sc_in<bool> awvalid;
+	sc_in<CFG::id_type> awid;
+	sc_in<CFG::addr_type> awaddr;
+	sc_in<CFG::len_type> awlen;
+	sc_in<CFG::size_type> awsize;
+	sc_out<bool> awready;
+
+	amba3_axi_aw_base_target(const char* name=sc_gen_unique_name("amba3_axi_aw_base_target"))
+	:awvalid(PIN_NAME(name,"awvalid"))
+	,awid(PIN_NAME(name,"awid"))
+	,awaddr(PIN_NAME(name,"awaddr"))
+	,awlen(PIN_NAME(name,"awlen"))
+	,awsize(PIN_NAME(name,"awsize"))
+	,awready(PIN_NAME(name,"awready")){}
+
+
+	template<class C> void bind(C& c){
+		awvalid(c.awvalid);
+		awid(c.awid);
+		awaddr(c.awaddr);
+		awlen(c.awlen);
+		awsize(c.awsize);
+		awready(c.awready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
+
 template<class CFG=amba3_axi_type> class amba3_axi_ar_base_initiator{
 public:
 	sc_out<bool> arvalid;
@@ -342,6 +375,37 @@ public:
 	sc_in<bool> arready;
 
 	amba3_axi_ar_base_initiator(const char* name=sc_gen_unique_name("amba3_axi_ar_base_initiator"))
+	:arvalid(PIN_NAME(name,"arvalid"))
+	,arid(PIN_NAME(name,"arid"))
+	,araddr(PIN_NAME(name,"araddr"))
+	,arlen(PIN_NAME(name,"arlen"))
+	,arsize(PIN_NAME(name,"arsize"))
+	,arready(PIN_NAME(name,"arready")){}
+
+	template<class C> void bind(C& c){
+		arvalid(c.arvalid);
+		arid(c.arid);
+		araddr(c.araddr);
+		arlen(c.arlen);
+		arsize(c.arsize);
+		arready(c.arready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
+
+template<class CFG=amba3_axi_type> class amba3_axi_ar_base_target{
+public:
+	sc_in<bool> arvalid;
+	sc_in<CFG::id_type> arid;
+	sc_in<CFG::addr_type> araddr;
+	sc_in<CFG::len_type> arlen;
+	sc_in<CFG::size_type> arsize;
+	sc_out<bool> arready;
+
+	amba3_axi_ar_base_target(const char* name=sc_gen_unique_name("amba3_axi_ar_base_target"))
 	:arvalid(PIN_NAME(name,"arvalid"))
 	,arid(PIN_NAME(name,"arid"))
 	,araddr(PIN_NAME(name,"araddr"))
@@ -393,6 +457,38 @@ public:
 	}
 };
 
+template<class CFG=amba3_axi_type> class amba3_axi_wd_base_target{
+public:
+	sc_in<bool> wvalid;
+	sc_in<CFG::id_type> wid;
+	sc_in<bool> wlast;
+	sc_in<CFG::strb_type> wstrb;
+	sc_in<CFG::data_type> wdata;
+
+	sc_out<bool> wready;
+
+	amba3_axi_wd_base_target(const char* name=sc_gen_unique_name("amba3_axi_wd_base_target"))
+	:wid(PIN_NAME(name,"wid"))
+	,wlast(PIN_NAME(name,"wlast"))
+	,wstrb(PIN_NAME(name,"wstrb"))
+	,wdata(PIN_NAME(name,"wdata"))
+	,wready(PIN_NAME(name,"wready")){}
+
+	template<class C> void bind(C& c){
+		wvalid(c.wvalid);
+		wid(c.wid);
+		wlast(c.wlast);
+		wstrb(c.wstrb);
+		wdata(c.wdata);
+		wready(c.wready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
+
+
 
 template<class CFG=amba3_axi_type> class amba3_axi_rd_base_initiator{
 public:
@@ -423,7 +519,38 @@ public:
 	template<class C> void operator()(C& c){
 		bind(c);
 	}
+};
 
+
+template<class CFG=amba3_axi_type> class amba3_axi_rd_base_target{
+public:
+	sc_out<bool> rvalid;
+	sc_out<CFG::id_type> rid;
+	sc_out<bool> rlast;
+	sc_out<CFG::resp_type> rresp;
+	sc_out<CFG::data_type> rdata;
+	sc_in<bool> rready;
+
+	amba3_axi_rd_base_target(const char* name=sc_gen_unique_name("amba3_axi_rd_base_target"))
+	:rvalid(PIN_NAME(name,"rvalid"))
+	,rid(PIN_NAME(name,"rid"))
+	,rlast(PIN_NAME(name,"rlast"))
+	,rresp(PIN_NAME(name,"rresp"))
+	,rdata(PIN_NAME(name,"rdata"))
+	,rready(PIN_NAME(name,"rready")){}
+
+	template<class C> void bind(C& c){
+		rvalid(c.rvalid);
+		rid(c.rid);
+		rlast(c.rlast);
+		rresp(c.rresp);
+		rdata(c.rdata);
+		rready(c.rready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
 };
 
 template<class CFG=amba3_axi_type> class amba3_axi_br_base_initiator{
@@ -434,6 +561,32 @@ public:
 	sc_out<bool> bready;
 
 	amba3_axi_br_base_initiator(const char* name=sc_gen_unique_name("amba3_axi_br_base_initiator")):
+	bvalid(PIN_NAME(name,"bvalid"))
+	,bid(PIN_NAME(name,"bid"))
+	,bresp(PIN_NAME(name,"bresp"))
+	,bready(PIN_NAME(name,"bready")){}
+
+	template<class C> void bind(C& c){
+		bvalid(c.bvalid);
+		bid(c.bid);
+		bresp(c.bresp);
+		bready(c.bready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
+
+
+template<class CFG=amba3_axi_type> class amba3_axi_br_base_target{
+public:
+	sc_out<bool> bvalid;
+	sc_out<CFG::id_type> bid;
+	sc_out<CFG::resp_type> bresp;
+	sc_in<bool> bready;
+
+	amba3_axi_br_base_target(const char* name=sc_gen_unique_name("amba3_axi_br_base_target")):
 	bvalid(PIN_NAME(name,"bvalid"))
 	,bid(PIN_NAME(name,"bid"))
 	,bresp(PIN_NAME(name,"bresp"))
@@ -463,6 +616,46 @@ public:
 
 
 	amba3_axi_w_base_initiator(const char* name=sc_gen_unique_name("amba3_axi_w_base_initiator"))
+	:aw_type(name),wd_type(name),br_type(name){}
+
+	template<class C> void bind(C& c){
+		aw_type::awvalid(c.awvalid);
+		aw_type::awid(c.awid);
+		aw_type::awaddr(c.awaddr);
+		aw_type::awlen(c.awlen);
+		aw_type::awsize(c.awsize);
+		aw_type::awready(c.awready);
+
+		wd_type::wvalid(c.wvalid);
+		wd_type::wid(c.wid);
+		wd_type::wlast(c.wlast);
+		wd_type::wstrb(c.wstrb);
+		wd_type::wdata(c.wdata);
+		wd_type::wready(c.wready);
+
+		br_type::bvalid(c.bvalid);
+		br_type::bid(c.bid);
+		br_type::bresp(c.bresp);
+		br_type::bready(c.bready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
+
+template<class CFG=amba3_axi_type> class amba3_axi_w_base_target
+:public amba3_axi_aw_base_target<CFG>
+,public amba3_axi_wd_base_target<CFG>
+,public amba3_axi_br_base_target<CFG>
+{
+public:
+	typedef amba3_axi_aw_base_target<CFG> aw_type;
+	typedef amba3_axi_wd_base_target<CFG> wd_type;
+	typedef amba3_axi_br_base_target<CFG> br_type;
+
+
+	amba3_axi_w_base_target(const char* name=sc_gen_unique_name("amba3_axi_w_base_target"))
 	:aw_type(name),wd_type(name),br_type(name){}
 
 	template<class C> void bind(C& c){
@@ -522,6 +715,34 @@ public:
 	}
 };
 
+template<class CFG=amba3_axi_type> class amba3_axi_r_base_target:public amba3_axi_ar_base_target<CFG>, public amba3_axi_rd_base_target<CFG>{
+public:
+	typedef amba3_axi_ar_base_target<CFG> ar_type;
+	typedef amba3_axi_rd_base_target<CFG> rd_type;
+
+
+	amba3_axi_r_base_target(const char* name=sc_gen_unique_name("amba3_axi_r_base_target")):ar_type(name),rd_type(name){}
+
+	template<class C> void bind(C& c){
+		ar_type::arvalid(c.arvalid);
+		ar_type::arid(c.arid);
+		ar_type::araddr(c.araddr);
+		ar_type::arlen(c.arlen);
+		ar_type::arsize(c.arsize);
+		ar_type::arready(c.arready);
+
+		rd_type::rvalid(c.rvalid);
+		rd_type::rid(c.rid);
+		rd_type::rlast(c.rlast);
+		rd_type::rresp(c.rresp);
+		rd_type::rdata(c.rdata);
+		rd_type::rready(c.rready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
 
 template<class CFG=amba3_axi_type> class amba3_axi_base_initiator
 :public amba3_axi_aw_base_initiator<CFG>
@@ -581,6 +802,67 @@ public:
 	}
 };
 
+
+template<class CFG=amba3_axi_type> class amba3_axi_base_target
+:public amba3_axi_aw_base_target<CFG>
+,public amba3_axi_wd_base_target<CFG>
+,public amba3_axi_br_base_target<CFG>
+,public amba3_axi_ar_base_target<CFG>
+,public amba3_axi_rd_base_target<CFG>{
+
+public:
+	typedef amba3_axi_aw_base_target<CFG> aw_type;
+	typedef amba3_axi_wd_base_target<CFG> wd_type;
+	typedef amba3_axi_br_base_target<CFG> br_type;
+	typedef amba3_axi_ar_base_target<CFG> ar_type;
+	typedef amba3_axi_rd_base_target<CFG> rd_type;
+
+
+	amba3_axi_base_target(const char* name=sc_gen_unique_name("amba3_axi_base_target"))
+	:aw_type(name),wd_type(name),br_type(name),ar_type(name),rd_type(name){}
+
+	template<class C> void bind(C& c){
+		aw_type::awvalid(c.awvalid);
+		aw_type::awid(c.awid);
+		aw_type::awaddr(c.awaddr);
+		aw_type::awlen(c.awlen);
+		aw_type::awsize(c.awsize);
+		aw_type::awready(c.awready);
+
+		wd_type::wvalid(c.wvalid);
+		wd_type::wid(c.wid);
+		wd_type::wlast(c.wlast);
+		wd_type::wstrb(c.wstrb);
+		wd_type::wdata(c.wdata);
+		wd_type::wready(c.wready);
+
+		br_type::bvalid(c.bvalid);
+		br_type::bid(c.bid);
+		br_type::bresp(c.bresp);
+		br_type::bready(c.bready);
+
+		ar_type::arvalid(c.arvalid);
+		ar_type::arid(c.arid);
+		ar_type::araddr(c.araddr);
+		ar_type::arlen(c.arlen);
+		ar_type::arsize(c.arsize);
+		ar_type::arready(c.arready);
+
+		rd_type::rvalid(c.rvalid);
+		rd_type::rid(c.rid);
+		rd_type::rlast(c.rlast);
+		rd_type::rresp(c.rresp);
+		rd_type::rdata(c.rdata);
+		rd_type::rready(c.rready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
+
+
+
 template<class CFG=amba3_axi_type, class BF=NONBUFFERABLE>class amba3_axi_aw_initiator_:public sc_module, public amba3_axi_aw_base_initiator<CFG>{
 public:
 	typedef amba3_axi_aw_base_initiator<CFG> base_type;
@@ -609,7 +891,7 @@ public:
 		base_type::awaddr.write(aw.addr);
 		base_type::awlen.write(aw.len);
 		base_type::awsize.write(aw.size);
-		STALL( base_type::awready.read() );
+		STALL( base_type::awready.read() == false);
 		base_type::awvalid.write(false);
 	}
 
@@ -641,8 +923,71 @@ public:
 	template<class C> void operator()(C& c){
 		bind(c);
 	}
-
 };
+
+template<class CFG=amba3_axi_type, class BF=NONBUFFERABLE>class amba3_axi_aw_target_:public sc_module, public amba3_axi_aw_base_target<CFG>{
+public:
+	typedef amba3_axi_aw_base_target<CFG> base_type;
+	typedef amba3_axi_address_type<CFG> data_type;
+
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	amba3_axi_aw_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_aw_target_")):sc_module(name),base_type(name){
+		end_module();
+	}
+
+	virtual void aw_reset(){
+		base_type::awready.write(false);
+	}
+
+	virtual void b_get_aw( amba3_axi_address_type<CFG>& aw ){
+		amba3_axi_address_type<CFG> _aw = amba3_axi_address_type<CFG>();
+
+		base_type::awready.write(true);
+		STALL( base_type::awvalid.read() == false);
+		base_type::awready.write(false);
+
+		_aw.id = base_type::awid.read();
+		_aw.addr = base_type::awaddr.read();
+		_aw.len = base_type::awlen.read();
+		_aw.size = base_type::awsize.read();
+
+		aw = _aw;
+	}
+
+	virtual bool nb_get_aw( amba3_axi_address_type<CFG>& aw ){
+		bool condition = false;
+		amba3_axi_address_type<CFG> _aw = amba3_axi_address_type<CFG>();
+
+		base_type::awready.write(true);
+		wait();
+		base_type::awready.write(false);
+
+		_aw.id = base_type::awid.read();
+		_aw.addr = base_type::awaddr.read();
+		_aw.len = base_type::awlen.read();
+		_aw.size = base_type::awsize.read();
+
+		condition = base_type::awvalid.read();
+
+		return condition;
+	}
+
+	template<class C> void bind(C& c){
+		base_type::awvalid(c.awvalid);
+		base_type::awid(c.awid);
+		base_type::awaddr(c.awaddr);
+		base_type::awlen(c.awlen);
+		base_type::awsize(c.awsize);
+		base_type::awready(c.awready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
+
 
 template<class CFG=amba3_axi_type, class BF=NONBUFFERABLE>class amba3_axi_ar_initiator_:public sc_module, public amba3_axi_ar_base_initiator<CFG>{
 public:
@@ -657,7 +1002,7 @@ public:
 	}
 
 	virtual void ar_reset(){
-		amba3_axi_address_type<CFG> ar;
+		amba3_axi_address_type<CFG> ar = amba3_axi_address_type<CFG>();
 
 		base_type::arvalid.write(false);
 		base_type::arid.write(ar.id);
@@ -707,6 +1052,68 @@ public:
 
 };
 
+template<class CFG=amba3_axi_type, class BF=NONBUFFERABLE>class amba3_axi_ar_target_:public sc_module, public amba3_axi_ar_base_target<CFG>{
+public:
+	typedef amba3_axi_ar_base_target<CFG> base_type;
+	typedef amba3_axi_address_type<CFG> data_type;
+
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	amba3_axi_ar_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_ar_target_")):sc_module(name),base_type(name){
+		end_module();
+	}
+
+	virtual void ar_reset(){
+		base_type::arready.write(false);
+	}
+
+	virtual void b_get_ar( amba3_axi_address_type<CFG>& ar ){
+		amba3_axi_address_type<CFG> _ar = amba3_axi_address_type<CFG>();
+
+		base_type::arready.write(true);
+		STALL( base_type::arvalid.read() == false);
+		base_type::arready.write(false);
+
+		_ar.id = base_type::arid.read();
+		_ar.addr = base_type::araddr.read();
+		_ar.len = base_type::arlen.read();
+		_ar.size = base_type::arsize.read();
+
+		ar = _ar;
+	}
+
+	virtual bool nb_get_ar( amba3_axi_address_type<CFG>& ar ){
+		bool condition = false;
+		amba3_axi_address_type<CFG> _ar = amba3_axi_address_type<CFG>();
+
+		base_type::arready.write(true);
+		wait();
+		base_type::arready.write(false);
+
+		_ar.id = base_type::arid.read();
+		_ar.addr = base_type::araddr.read();
+		_ar.len = base_type::arlen.read();
+		_ar.size = base_type::arsize.read();
+
+		condition = base_type::arvalid.read();
+
+		return condition;
+	}
+
+	template<class C> void bind(C& c){
+		base_type::arvalid(c.arvalid);
+		base_type::arid(c.arid);
+		base_type::araddr(c.araddr);
+		base_type::arlen(c.arlen);
+		base_type::arsize(c.arsize);
+		base_type::arready(c.arready);
+	}
+
+	template<class C> void operator()(C& c){
+		bind(c);
+	}
+};
 
 template<class CFG=amba3_axi_type,class BF=NONBUFFERABLE> class amba3_axi_wd_initiator_:public sc_module, public amba3_axi_wd_base_initiator<CFG>{
 public:
@@ -761,6 +1168,60 @@ public:
 
 };
 
+
+template<class CFG=amba3_axi_type,class BF=NONBUFFERABLE> class amba3_axi_wd_target_:public sc_module, public amba3_axi_wd_base_target<CFG>{
+public:
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	typedef amba3_axi_wd_base_target<CFG> base_type;
+	typedef amba3_axi_wd_type<CFG> data_type;
+
+	SC_HAS_PROCESS(amba3_axi_wd_target_);
+	amba3_axi_wd_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_wd_target_")):sc_module(name),base_type(name){
+		end_module();
+	}
+
+
+	virtual void wd_reset(){
+		base_type::wready.write(false);
+	}
+
+	virtual void b_get_wd(amba3_axi_wd_type<CFG>& wd){
+		amba3_axi_wd_type<CFG> _wd = amba3_axi_wd_type<CFG>();
+
+		base_type::wready.write(true);
+		STALL(base_type::wvalid.read() == false);
+		base_type::wready.write(false);
+
+		_wd.id = base_type::wid.read();
+		_wd.last = base_type::wlast.read();
+		_wd.strb = base_type::wstrb.read();
+		_wd.data = base_type::wdata.read();
+
+		wd = _wd;
+	}
+
+	virtual bool nb_get_wd(amba3_axi_wd_type<CFG>& wd){
+		bool condition = false;
+		amba3_axi_wd_type<CFG> _wd = amba3_axi_wd_type<CFG>();
+
+		base_type::wready.write(true);
+		wait();
+		base_type::wready.write(false);
+
+		_wd.id = base_type::wid.read();
+		_wd.last = base_type::wlast.read();
+		_wd.strb = base_type::wstrb.read();
+		_wd.data = base_type::wdata.read();
+		wd = _wd;
+		condition = base_type::wvalid.read();
+
+		return condition;
+	}
+
+};
+
 template<class CFG=amba3_axi_type,class BF=NONBUFFERABLE> class amba3_axi_rd_initiator_:public sc_module, public amba3_axi_rd_base_initiator<CFG>{
 public:
 	sc_in<bool> clk;
@@ -803,8 +1264,65 @@ public:
 		_rd.data = base_type::rdata.read();
 		_rd.resp = base_type::rresp.read();
 		_rd.last = base_type::rlast.read();
+		condition = base_type::rvalid.read();
 
 		rd = _rd;
+		return condition;
+	}
+
+};
+
+
+template<class CFG=amba3_axi_type,class BF=NONBUFFERABLE> class amba3_axi_rd_target_:public sc_module, public amba3_axi_rd_base_target<CFG>{
+public:
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	typedef amba3_axi_rd_base_target<CFG> base_type;
+	typedef amba3_axi_rd_type<CFG> data_type;
+
+	SC_HAS_PROCESS(amba3_axi_rd_target_);
+	amba3_axi_rd_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_rd_target_")):sc_module(name),base_type(name){
+		end_module();
+	}
+
+	virtual void rd_reset(){
+		amba3_axi_rd_type<CFG> rd = amba3_axi_rd_type<CFG>();
+
+		base_type::rvalid.write(false);
+		base_type::rid.write(rd.id);
+		base_type::rlast.write(rd.last);
+		base_type::rresp.write(rd.resp);
+		base_type::rdata.write(rd.data);
+	}
+
+	virtual void b_put_rd(const amba3_axi_rd_type<CFG>& rd){
+		base_type::rid.write(rd.id);
+		base_type::rlast.write(rd.last);
+		base_type::rresp.write(rd.resp);
+		base_type::rdata.write(rd.data);
+
+		base_type::rvalid.write(true);
+		STALL(base_type::rready.read() == false);
+		base_type::rvalid.write(false);
+	}
+
+	virtual bool nb_put_rd(const amba3_axi_rd_type<CFG>& rd){
+		amba3_axi_rd_type<CFG> _rd;
+
+		bool condition = false;
+
+		base_type::rid.write(rd.id);
+		base_type::rlast.write(rd.last);
+		base_type::rresp.write(rd.resp);
+		base_type::rdata.write(rd.data);
+
+		base_type::rvalid.write(true);
+		wait();
+		base_type::rvalid.write(false);
+
+		condition = base_type::rready.read();
+
 		return condition;
 	}
 
@@ -844,10 +1362,57 @@ public:
 		br.id = base_type::bid.read();
 		br.resp = base_type::bresp.read();
 		base_type::bready.write(false);
+		condition = base_type::bvalid.read();
 
 		return condition;
 	}
+};
 
+
+
+template<class CFG=amba3_axi_type,class BF=NONBUFFERABLE> class amba3_axi_br_target_:public sc_module, public amba3_axi_br_base_target<CFG>{
+public:
+	sc_in<bool> clk;
+	sc_in<bool> nrst;
+
+	typedef amba3_axi_br_base_target<CFG> base_type;
+	typedef amba3_axi_resp_type<CFG> data_type;
+
+	SC_HAS_PROCESS(amba3_axi_br_target_);
+	amba3_axi_br_target_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_br_target_")):sc_module(name),base_type(name){
+		end_module();
+	}
+
+	virtual void br_reset(){
+		amba3_axi_resp_type<CFG> br =  amba3_axi_resp_type<CFG>();
+
+		base_type::bvalid.write(false);
+		base_type::bid.write(br.id);
+		base_type::bresp.write(br.resp);
+	}
+
+	virtual void b_put_br(const amba3_axi_resp_type<CFG>& br){
+
+		base_type::bvalid.write(true);
+		base_type::bid.write(br.id);
+		base_type::bresp.write(br.resp);
+		STALL(base_type::bready.read() == false);
+		base_type::bvalid.write(false);
+
+	}
+
+	virtual bool nb_put_br(const amba3_axi_resp_type<CFG>& br){
+		bool condition = false;
+
+		base_type::bvalid.write(true);
+		base_type::bid.write(br.id);
+		base_type::bresp.write(br.resp);
+		wait();
+		base_type::bvalid.write(false);
+		condition = base_type::bready.read();
+
+		return condition;
+	}
 };
 
 template<class CFG=amba3_axi_type>class amba3_axi_aw_initiator_<CFG,BUFFERABLE>:public sc_module, public amba3_axi_aw_base_initiator<CFG>{
