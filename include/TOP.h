@@ -16,11 +16,14 @@ public:
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
 
-	amba3_axi_initiator_<> put_if;
+	amba3_axi_initiator_<amba3_axi_type> put_if;
 //	syn_fifo_3<sc_uint<4> >::put put_if;
 
 	SC_HAS_PROCESS(Producer);
-	Producer(const sc_module_name name):sc_module(name){
+	Producer(const sc_module_name name):sc_module(name),put_if("put_if"){
+		put_if.clk(clk);
+		put_if.nrst(nrst);
+
 		cout << "Instanced." << endl;
 
 		SC_CTHREAD(thread,clk.pos());
@@ -49,11 +52,14 @@ public:
 	sc_in<bool> clk;
 	sc_in<bool> nrst;
 
-	amba3_axi_target_<> get_if;
+	amba3_axi_target_<amba3_axi_type> get_if;
 //	syn_fifo_3<sc_uint<4> >::get get_if;
 
 	SC_HAS_PROCESS(Consumer);
-	Consumer(const sc_module_name name):sc_module(name){
+	Consumer(const sc_module_name name):sc_module(name),get_if("get_if"){
+		get_if.clk(clk);
+		get_if.nrst(nrst);
+
 		cout << "Instanced." << endl;
 		SC_CTHREAD(thread,clk.pos());
 		reset_signal_is(nrst,false);
@@ -87,7 +93,7 @@ public:
 	Producer producer;
 	Consumer consumer;
 
-	amba3_axi_sig chain;
+	amba3_axi_sig<amba3_axi_type> chain;
 //	syn_fifo_3<sc_uint<4> >::channel chain;
 
 	SC_HAS_PROCESS(TOP);
