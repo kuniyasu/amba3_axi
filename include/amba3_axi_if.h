@@ -885,6 +885,7 @@ public:
 
 	void thread(){
 		_aw_reset();
+		fifo.r_reset();
 		wait();
 
 		while( true ){
