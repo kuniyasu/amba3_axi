@@ -1241,6 +1241,36 @@ public:
 		end_module();
 	}
 
+	virtual void rd_reset(){
+		base_type::rready.write(false);
+		rready_sig.write(false);
+	}
+
+	virtual void b_get_rd(data_type& dt){
+		base_type::rready.write(true);
+		rready_sig.write(true);
+		STALL(rvalid_sig.read() == false);
+		base_type::rready.write(false);
+		rready_sig.write(false);
+
+		dt = reg_slice.read();
+	}
+
+	virtual bool nb_get_rd(data_type& dt){
+		bool condition = false;
+
+		base_type::rready.write(true);
+		rready_sig.write(true);
+		wait();
+		base_type::rready.write(false);
+		rready_sig.write(false);
+
+		condition = rvalid_sig.read();
+		dt = reg_slice.read();
+
+		return condition;
+	}
+
 	void reg_slice_thread(){
 		data_type d;
 		rvalid_sig.write(false);
@@ -1249,7 +1279,13 @@ public:
 
 		while( true ){
 			rvalid_sig.write(base_type::rvalid.read());
+
+			d.id = base_type::rid.read();
+			d.resp = base_type::rresp.read();
+			d.last = base_type::rlast.read();
+			d.data = base_type::rdata.read();
 			reg_slice.write(d);
+
 			STALL( rready_sig.read() == false );
 		}
 	}
@@ -1266,19 +1302,63 @@ public:
 	typedef amba3_axi_br_base_initiator<CFG> base_type;
 	typedef amba3_axi_resp_type<CFG> data_type;
 
+	sc_signal<bool> bvalid_sig;
 	sc_signal<data_type> reg_slice;
+	sc_signal<bool> bready_sig;
 
 	SC_HAS_PROCESS(amba3_axi_br_initiator_);
 	amba3_axi_br_initiator_(const sc_module_name& name=sc_gen_unique_name("amba3_axi_br_initiator_")):sc_module(name),base_type(name){
-
-		SC_METHOD(reg_slice_method);
-		sensitive << clk.pos() << nrst.neg();
-
+		SC_CTHREAD(reg_slice_thread,clk.pos());
+		async_reset_signal_is(nrst,false);
 		end_module();
 	}
 
-	void reg_slice_method(){
+	virtual void br_reset(){
+		bready_sig.write(false);
+		base_type::bready.write(false);
+	}
 
+	virtual void b_get_br(data_type& dt){
+		bready_sig.write(false);
+		base_type::bready.write(false);
+		STALL(bvalid_sig.read() == false);
+		bready_sig.write(false);
+		base_type::bready.write(false);
+
+		dt = reg_slice.read();
+	}
+
+	virtual bool nb_get_br(data_type& dt){
+		bool condition = false;
+
+		bready_sig.write(false);
+		base_type::bready.write(false);
+		wait();
+		bready_sig.write(false);
+		base_type::bready.write(false);
+		condition = bvalid_sig.read();
+
+		dt = reg_slice.read();
+
+		return condition;
+	}
+
+	void reg_slice_thread(){
+		data_type d;
+		d.reset();
+		reg_slice.write(d);
+		bvalid_sig.write(false);
+		wait();
+
+		while( true ){
+			bvalid_sig = base_type::bvalid.read();
+
+			d.id = base_type::bid.read();
+			d.resp = base_type::bresp.read();
+			reg_slice.write(d);
+
+			STALL(bready_sig.read() == false);
+		}
 	}
 
 };
