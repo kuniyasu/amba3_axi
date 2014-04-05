@@ -375,6 +375,7 @@ public:
 	sc_signal<typename CFG::addr_type> awaddr;
 	sc_signal<typename CFG::len_type> awlen;
 	sc_signal<typename CFG::size_type> awsize;
+	sc_signal<typename CFG::burst_type> awburst;
 	sc_signal<bool> awready;
 
 	amba3_axi_aw_sig(const char* name=sc_gen_unique_name("amba3_axi_aw_sig")){}
@@ -387,6 +388,7 @@ public:
 	sc_signal<typename CFG::addr_type> araddr;
 	sc_signal<typename CFG::len_type> arlen;
 	sc_signal<typename CFG::size_type> arsize;
+	sc_signal<typename CFG::burst_type> arburst;
 	sc_signal<bool> arready;
 
 	amba3_axi_ar_sig(const char* name=sc_gen_unique_name("amba3_axi_ar_sig")){}
@@ -491,6 +493,7 @@ public:
 	sc_out<typename CFG::addr_type> awaddr;
 	sc_out<typename CFG::len_type> awlen;
 	sc_out<typename CFG::size_type> awsize;
+	sc_out<typename CFG::burst_type> awburst;
 	sc_in<bool> awready;
 
 	amba3_axi_aw_base_initiator(const char* name=sc_gen_unique_name("amba3_axi_aw_base_initiator"))
@@ -499,6 +502,7 @@ public:
 	,awaddr(PIN_NAME(name,"awaddr"))
 	,awlen(PIN_NAME(name,"awlen"))
 	,awsize(PIN_NAME(name,"awsize"))
+	,awburst(PIN_NAME(name,"awburst"))
 	,awready(PIN_NAME(name,"awready")){}
 
 
@@ -508,6 +512,7 @@ public:
 		awaddr(c.awaddr);
 		awlen(c.awlen);
 		awsize(c.awsize);
+		awburst(c.awburst);
 		awready(c.awready);
 	}
 
@@ -524,6 +529,7 @@ public:
 	sc_in<typename CFG::addr_type> awaddr;
 	sc_in<typename CFG::len_type> awlen;
 	sc_in<typename CFG::size_type> awsize;
+	sc_in<typename CFG::burst_type> awburst;
 	sc_out<bool> awready;
 
 	amba3_axi_aw_base_target(const char* name=sc_gen_unique_name("amba3_axi_aw_base_target"))
@@ -532,6 +538,7 @@ public:
 	,awaddr(PIN_NAME(name,"awaddr"))
 	,awlen(PIN_NAME(name,"awlen"))
 	,awsize(PIN_NAME(name,"awsize"))
+	,awburst(PIN_NAME(name,"awburst"))
 	,awready(PIN_NAME(name,"awready")){}
 
 
@@ -541,6 +548,7 @@ public:
 		awaddr(c.awaddr);
 		awlen(c.awlen);
 		awsize(c.awsize);
+		awburst(c.awburst);
 		awready(c.awready);
 	}
 
@@ -556,6 +564,7 @@ public:
 	sc_out<typename CFG::addr_type> araddr;
 	sc_out<typename CFG::len_type> arlen;
 	sc_out<typename CFG::size_type> arsize;
+	sc_out<typename CFG::burst_type> arburst;
 	sc_in<bool> arready;
 
 	amba3_axi_ar_base_initiator(const char* name=sc_gen_unique_name("amba3_axi_ar_base_initiator"))
@@ -564,6 +573,7 @@ public:
 	,araddr(PIN_NAME(name,"araddr"))
 	,arlen(PIN_NAME(name,"arlen"))
 	,arsize(PIN_NAME(name,"arsize"))
+	,arburst(PIN_NAME(name,"arburst"))
 	,arready(PIN_NAME(name,"arready")){}
 
 	template<class C> void bind(C& c){
@@ -572,6 +582,7 @@ public:
 		araddr(c.araddr);
 		arlen(c.arlen);
 		arsize(c.arsize);
+		arburst(c.arburst);
 		arready(c.arready);
 	}
 
@@ -587,6 +598,7 @@ public:
 	sc_in<typename CFG::addr_type> araddr;
 	sc_in<typename CFG::len_type> arlen;
 	sc_in<typename CFG::size_type> arsize;
+	sc_in<typename CFG::burst_type> arburst;
 	sc_out<bool> arready;
 
 	amba3_axi_ar_base_target(const char* name=sc_gen_unique_name("amba3_axi_ar_base_target"))
@@ -595,6 +607,7 @@ public:
 	,araddr(PIN_NAME(name,"araddr"))
 	,arlen(PIN_NAME(name,"arlen"))
 	,arsize(PIN_NAME(name,"arsize"))
+	,arburst(PIN_NAME(name,"arburst"))
 	,arready(PIN_NAME(name,"arready")){}
 
 	template<class C> void bind(C& c){
@@ -603,6 +616,7 @@ public:
 		araddr(c.araddr);
 		arlen(c.arlen);
 		arsize(c.arsize);
+		arburst(c.arburst);
 		arready(c.arready);
 	}
 
@@ -808,6 +822,7 @@ public:
 		aw_type::awaddr(c.awaddr);
 		aw_type::awlen(c.awlen);
 		aw_type::awsize(c.awsize);
+		aw_type::awburst(c.awburst);
 		aw_type::awready(c.awready);
 
 		wd_type::wvalid(c.wvalid);
@@ -848,6 +863,7 @@ public:
 		aw_type::awaddr(c.awaddr);
 		aw_type::awlen(c.awlen);
 		aw_type::awsize(c.awsize);
+		aw_type::awburst(c.awburst);
 		aw_type::awready(c.awready);
 
 		wd_type::wvalid(c.wvalid);
@@ -884,6 +900,7 @@ public:
 		ar_type::araddr(c.araddr);
 		ar_type::arlen(c.arlen);
 		ar_type::arsize(c.arsize);
+		ar_type::arburst(c.arburst);
 		ar_type::arready(c.arready);
 
 		rd_type::rvalid(c.rvalid);
@@ -913,6 +930,7 @@ public:
 		ar_type::araddr(c.araddr);
 		ar_type::arlen(c.arlen);
 		ar_type::arsize(c.arsize);
+		ar_type::arburst(c.arburst);
 		ar_type::arready(c.arready);
 
 		rd_type::rvalid(c.rvalid);
@@ -952,6 +970,7 @@ public:
 		aw_type::awaddr(c.awaddr);
 		aw_type::awlen(c.awlen);
 		aw_type::awsize(c.awsize);
+		aw_type::awburst(c.awburst);
 		aw_type::awready(c.awready);
 
 		wd_type::wvalid(c.wvalid);
@@ -971,6 +990,7 @@ public:
 		ar_type::araddr(c.araddr);
 		ar_type::arlen(c.arlen);
 		ar_type::arsize(c.arsize);
+		ar_type::arburst(c.arburst);
 		ar_type::arready(c.arready);
 
 		rd_type::rvalid(c.rvalid);
@@ -1011,6 +1031,7 @@ public:
 		aw_type::awaddr(c.awaddr);
 		aw_type::awlen(c.awlen);
 		aw_type::awsize(c.awsize);
+		aw_type::awburst(c.awburst);
 		aw_type::awready(c.awready);
 
 		wd_type::wvalid(c.wvalid);
@@ -1030,6 +1051,7 @@ public:
 		ar_type::araddr(c.araddr);
 		ar_type::arlen(c.arlen);
 		ar_type::arsize(c.arsize);
+		ar_type::arburst(c.arburst);
 		ar_type::arready(c.arready);
 
 		rd_type::rvalid(c.rvalid);
@@ -1068,6 +1090,7 @@ public:
 		base_type::awaddr.write(aw.addr);
 		base_type::awlen.write(aw.len);
 		base_type::awsize.write(aw.size);
+		base_type::awburst.write(aw.burst);
 	}
 
 	virtual void b_put_aw(const amba3_axi_address_type<CFG>& aw ){
@@ -1077,6 +1100,8 @@ public:
 		base_type::awaddr.write(aw.addr);
 		base_type::awlen.write(aw.len);
 		base_type::awsize.write(aw.size);
+		base_type::awburst.write(aw.burst);
+
 		STALL( base_type::awready.read() == false);
 		base_type::awvalid.write(false);
 
@@ -1091,6 +1116,7 @@ public:
 			base_type::awaddr.write(aw.addr);
 			base_type::awlen.write(aw.len);
 			base_type::awsize.write(aw.size);
+			base_type::awburst.write(aw.burst);
 			wait();
 			base_type::awvalid.write(false);
 			condition = base_type::awready.read();
@@ -1105,6 +1131,7 @@ public:
 		base_type::awaddr(c.awaddr);
 		base_type::awlen(c.awlen);
 		base_type::awsize(c.awsize);
+		base_type::awburst(c.awburst);
 		base_type::awready(c.awready);
 	}
 
@@ -1142,6 +1169,7 @@ public:
 			_aw.addr = base_type::awaddr.read();
 			_aw.len = base_type::awlen.read();
 			_aw.size = base_type::awsize.read();
+			_aw.burst = base_type::awburst.read();
 		}
 
 		aw = _aw;
@@ -1159,6 +1187,8 @@ public:
 			_aw.addr = base_type::awaddr.read();
 			_aw.len = base_type::awlen.read();
 			_aw.size = base_type::awsize.read();
+			_aw.burst = base_type::awburst.read();
+
 			condition = base_type::awvalid.read();
 		}
 
@@ -1171,6 +1201,7 @@ public:
 		base_type::awaddr(c.awaddr);
 		base_type::awlen(c.awlen);
 		base_type::awsize(c.awsize);
+		base_type::awburst(c.awburst);
 		base_type::awready(c.awready);
 	}
 
@@ -1201,6 +1232,7 @@ public:
 		base_type::araddr.write(ar.addr);
 		base_type::arlen.write(ar.len);
 		base_type::arsize.write(ar.size);
+		base_type::arburst.write(ar.burst);
 	}
 
 	virtual void b_put_ar(const amba3_axi_address_type<CFG>& ar ){
@@ -1209,6 +1241,8 @@ public:
 		base_type::araddr.write(ar.addr);
 		base_type::arlen.write(ar.len);
 		base_type::arsize.write(ar.size);
+		base_type::arburst.write(ar.burst);
+
 		STALL( base_type::arready.read() == false);
 		base_type::arvalid.write(false);
 	}
@@ -1222,6 +1256,7 @@ public:
 			base_type::araddr.write(ar.addr);
 			base_type::arlen.write(ar.len);
 			base_type::arsize.write(ar.size);
+			base_type::arburst.write(ar.burst);
 			wait();
 			base_type::arvalid.write(false);
 			condition = base_type::arready.read();
@@ -1236,6 +1271,7 @@ public:
 		base_type::araddr(c.araddr);
 		base_type::arlen(c.arlen);
 		base_type::arsize(c.arsize);
+		base_type::arburst(c.arburst);
 		base_type::arready(c.arready);
 	}
 
@@ -1274,6 +1310,7 @@ public:
 			_ar.addr = base_type::araddr.read();
 			_ar.len = base_type::arlen.read();
 			_ar.size = base_type::arsize.read();
+			_ar.burst = base_type::arburst.read();
 		}
 
 		ar = _ar;
@@ -1287,10 +1324,13 @@ public:
 			base_type::arready.write(true);
 			wait();
 			base_type::arready.write(false);
+
 			_ar.id = base_type::arid.read();
 			_ar.addr = base_type::araddr.read();
 			_ar.len = base_type::arlen.read();
 			_ar.size = base_type::arsize.read();
+			_ar.burst = base_type::arburst.read();
+
 			condition = base_type::arvalid.read();
 		}
 
@@ -1303,6 +1343,7 @@ public:
 		base_type::araddr(c.araddr);
 		base_type::arlen(c.arlen);
 		base_type::arsize(c.arsize);
+		base_type::arburst(c.arburst);
 		base_type::arready(c.arready);
 	}
 
@@ -1727,6 +1768,7 @@ public:
 		base_type::awaddr.write(aw.addr);
 		base_type::awlen.write(aw.len);
 		base_type::awsize.write(aw.size);
+		base_type::awburst.write(aw.burst);
 	}
 
 	virtual void _b_put_aw(const amba3_axi_address_type<CFG>& aw ){
@@ -1735,6 +1777,8 @@ public:
 		base_type::awaddr.write(aw.addr);
 		base_type::awlen.write(aw.len);
 		base_type::awsize.write(aw.size);
+		base_type::awburst.write(aw.burst);
+
 		STALL( base_type::awready.read() == false);
 		base_type::awvalid.write(false);
 	}
@@ -1745,6 +1789,7 @@ public:
 		base_type::awaddr(c.awaddr);
 		base_type::awlen(c.awlen);
 		base_type::awsize(c.awsize);
+		base_type::awburst(c.awburst);
 		base_type::awready(c.awready);
 	}
 
@@ -1813,6 +1858,7 @@ public:
 			_aw.addr = base_type::awaddr.read();
 			_aw.len = base_type::awlen.read();
 			_aw.size = base_type::awsize.read();
+			_aw.burst = base_type::awburst.read();
 		}
 	}
 
@@ -1822,6 +1868,8 @@ public:
 		base_type::awaddr(c.awaddr);
 		base_type::awlen(c.awlen);
 		base_type::awsize(c.awsize);
+		base_type::awburst(c.awburst);
+
 		base_type::awready(c.awready);
 	}
 
@@ -1898,6 +1946,7 @@ public:
 			aw.addr = base_type::awaddr.read();
 			aw.len  = base_type::awlen.read();
 			aw.size = base_type::awsize.read();
+			aw.burst = base_type::awburst.read();
 
 			reg_slice.write(aw);
 			wait();
@@ -1910,6 +1959,7 @@ public:
 		base_type::awaddr(c.awaddr);
 		base_type::awlen(c.awlen);
 		base_type::awsize(c.awsize);
+		base_type::awburst(c.awburst);
 		base_type::awready(c.awready);
 	}
 
@@ -1972,6 +2022,7 @@ public:
 		base_type::araddr.write(ar.addr);
 		base_type::arlen.write(ar.len);
 		base_type::arsize.write(ar.size);
+		base_type::arburst.write(ar.burst);
 	}
 
 	virtual void _b_put_ar(const amba3_axi_address_type<CFG>& ar ){
@@ -1980,6 +2031,8 @@ public:
 		base_type::araddr.write(ar.addr);
 		base_type::arlen.write(ar.len);
 		base_type::arsize.write(ar.size);
+		base_type::arburst.write(ar.burst);
+
 		STALL( base_type::arready.read() == false);
 		base_type::arvalid.write(false);
 	}
@@ -1990,6 +2043,7 @@ public:
 		base_type::araddr(c.araddr);
 		base_type::arlen(c.arlen);
 		base_type::arsize(c.arsize);
+		base_type::arburst(c.arburst);
 		base_type::arready(c.arready);
 	}
 
@@ -2058,6 +2112,7 @@ public:
 			_ar.addr = base_type::araddr.read();
 			_ar.len = base_type::arlen.read();
 			_ar.size = base_type::arsize.read();
+			_ar.burst = base_type::arburst.read();
 		}
 
 		ar = _ar;
@@ -2069,6 +2124,7 @@ public:
 		base_type::araddr(c.araddr);
 		base_type::arlen(c.arlen);
 		base_type::arsize(c.arsize);
+		base_type::arburst(c.arburst);
 		base_type::arready(c.arready);
 	}
 
@@ -2150,6 +2206,7 @@ public:
 			ar.addr = base_type::araddr.read();
 			ar.len  = base_type::arlen.read();
 			ar.size = base_type::arsize.read();
+			ar.burst = base_type::arburst.read();
 
 			reg_slice.write(ar);
 			wait();
@@ -2162,6 +2219,8 @@ public:
 		base_type::araddr(c.araddr);
 		base_type::arlen(c.arlen);
 		base_type::arsize(c.arsize);
+		base_type::arburst(c.arburst);
+
 		base_type::arready(c.arready);
 	}
 
@@ -2952,6 +3011,7 @@ public:
 		aw_type::awaddr(c.awaddr);
 		aw_type::awlen(c.awlen);
 		aw_type::awsize(c.awsize);
+		aw_type::awburst(c.awburst);
 		aw_type::awready(c.awready);
 
 		wd_type::wvalid(c.wvalid);
@@ -3019,6 +3079,7 @@ public:
 		aw_type::awaddr(c.awaddr);
 		aw_type::awlen(c.awlen);
 		aw_type::awsize(c.awsize);
+		aw_type::awburst(c.awburst);
 		aw_type::awready(c.awready);
 
 		wd_type::wvalid(c.wvalid);
@@ -3077,6 +3138,7 @@ public:
 		ar_type::araddr(c.araddr);
 		ar_type::arlen(c.arlen);
 		ar_type::arsize(c.arsize);
+		ar_type::arburst(c.arburst);
 		ar_type::arready(c.arready);
 
 		rd_type::rvalid(c.rvalid);
@@ -3131,6 +3193,7 @@ public:
 		ar_type::araddr(c.araddr);
 		ar_type::arlen(c.arlen);
 		ar_type::arsize(c.arsize);
+		ar_type::arburst(c.arburst);
 		ar_type::arready(c.arready);
 
 		rd_type::rvalid(c.rvalid);
@@ -3222,6 +3285,7 @@ public:
 		aw_type::awaddr(c.awaddr);
 		aw_type::awlen(c.awlen);
 		aw_type::awsize(c.awsize);
+		aw_type::awburst(c.awburst);
 		aw_type::awready(c.awready);
 
 		wd_type::wvalid(c.wvalid);
@@ -3241,6 +3305,7 @@ public:
 		ar_type::araddr(c.araddr);
 		ar_type::arlen(c.arlen);
 		ar_type::arsize(c.arsize);
+		ar_type::arburst(c.arburst);
 		ar_type::arready(c.arready);
 
 		rd_type::rvalid(c.rvalid);
@@ -3333,6 +3398,7 @@ public:
 		aw_type::awaddr(c.awaddr);
 		aw_type::awlen(c.awlen);
 		aw_type::awsize(c.awsize);
+		aw_type::awburst(c.awburst);
 		aw_type::awready(c.awready);
 
 		wd_type::wvalid(c.wvalid);
@@ -3352,6 +3418,7 @@ public:
 		ar_type::araddr(c.araddr);
 		ar_type::arlen(c.arlen);
 		ar_type::arsize(c.arsize);
+		ar_type::arburst(c.arburst);
 		ar_type::arready(c.arready);
 
 		rd_type::rvalid(c.rvalid);
@@ -3441,6 +3508,7 @@ public:
 		base_type::awaddr(c.awaddr);
 		base_type::awlen(c.awlen);
 		base_type::awsize(c.awsize);
+		base_type::awburst(c.awburst);
 		base_type::awready(c.awready);
 
 		base_type::wvalid(c.wvalid);
@@ -3460,6 +3528,7 @@ public:
 		base_type::araddr(c.araddr);
 		base_type::arlen(c.arlen);
 		base_type::arsize(c.arsize);
+		base_type::arburst(c.arburst);
 		base_type::arready(c.arready);
 
 		base_type::rvalid(c.rvalid);
@@ -3527,6 +3596,7 @@ public:
 		base_type::awaddr(c.awaddr);
 		base_type::awlen(c.awlen);
 		base_type::awsize(c.awsize);
+		base_type::awburst(c.awburst);
 		base_type::awready(c.awready);
 
 		base_type::wvalid(c.wvalid);
@@ -3546,6 +3616,7 @@ public:
 		base_type::araddr(c.araddr);
 		base_type::arlen(c.arlen);
 		base_type::arsize(c.arsize);
+		base_type::arburst(c.arburst);
 		base_type::arready(c.arready);
 
 		base_type::rvalid(c.rvalid);
